@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ClassLibrary2.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,14 +19,21 @@ namespace Models.Entities
 
         public decimal Averagefuelout { get; set; }
 
-        public int Cemmission { get; set; }
+        [Range(0,250)]
+        public int COemmission { get; set; }
 
+        [Range(0, 200)]
         public int FuelCapacity { get; set; }
 
+        [Range(0, 30000)]
         public int MaxAllowedWeight { get; set; }
+
+        [Range(0, 100)]
         public int MinWeight { get; set; }
 
+        [Range(0,1000)]
         public int BaggageVolume { get; set; }
+
 
         public int Drivenkm { get; set; }
 
@@ -40,6 +48,14 @@ namespace Models.Entities
         public int EngineId {  get; set; }
         
         public virtual Engine Engine { get; set; }
+
+        public string UserId { get; set; }
+
+        public virtual AppUsers User { get; set; }
+
+
+
+
 
     }
 }

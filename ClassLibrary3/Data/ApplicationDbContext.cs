@@ -24,14 +24,7 @@ namespace Infrastucture.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<AppUsers>()
-            .HasOne(u => u.Address)
-            .WithOne() // Assuming Address does not have a navigation property to AppUsers
-            .HasForeignKey<AppUsers>(u => u.AddressId)
-            .OnDelete(DeleteBehavior.SetNull); // Disable cascade delete
-
-            modelBuilder.Entity<Address>()
-           .HasKey(u => u.AddressId);
+            
 
 
         }

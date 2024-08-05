@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,10 +24,7 @@ namespace ClassLibrary2.Entities
         public string LastName { get; set; }
 
 
-        public Guid? AddressId { get; set; }
- 
-        //[Required]
-        public virtual Address Address { get; set; }
+       
 
         [Required]
         [DataType(DataType.DateTime)]
@@ -35,6 +33,16 @@ namespace ClassLibrary2.Entities
         [NotMapped]
         [AllowNull]
         public IList<string> roles { get; set; }
+
+        //Navigational Properties
+
+        public Guid? AddressId { get; set; }
+
+        public virtual Address Address { get; set; }
+
+        public string VehicleId { get; set; }
+
+        public virtual Vehicles Vehicle { get; set; }
 
 
     }
