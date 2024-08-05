@@ -1,17 +1,22 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Infrastucture;
 using Infrastucture.Data;
 using static System.Formats.Asn1.AsnWriter;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using WebApplication1.MiddleWare;
+using CarCompany.API.MiddleWare;
 using Microsoft.OpenApi.Models;
+using Infrastucture.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//Configure serilog
+builder.SeriLogConfiguration();
+
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -58,6 +63,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//Create Async action is asynchronous
+await app.SeedRoles();
 
 app.UseHttpsRedirection();
 

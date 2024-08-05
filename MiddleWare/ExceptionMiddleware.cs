@@ -2,17 +2,17 @@
 using System.Net;
 using System.Text.Json;
 
-namespace WebApplication1.MiddleWare
+namespace CarCompany.API.MiddleWare
 {
     public class ExceptionMiddleware
     {
         //Asp.Net Core 8 Web API :https://www.youtube.com/watch?v=UqegTYn2aKE&list=PLazvcyckcBwitbcbYveMdXlw8mqoBDbTT&index=1
 
         private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly Serilog.ILogger _logger;
         private readonly IHostEnvironment _hostEnvironment;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment hostEnvironment)
+        public ExceptionMiddleware(RequestDelegate next, Serilog.ILogger logger, IHostEnvironment hostEnvironment)
         {
             _next = next;
             _logger = logger;
@@ -23,11 +23,11 @@ namespace WebApplication1.MiddleWare
             try
             {
                 await _next(context);
-                _logger.LogInformation("Success");
+                _logger.Information("Success, No Problem in Middleware");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"This Error come From exception Middleware {ex.Message} !");
+                _logger.Error(ex, $"This Error come From exception Middleware {ex.Message} !");
   
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
