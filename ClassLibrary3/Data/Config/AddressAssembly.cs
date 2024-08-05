@@ -14,11 +14,24 @@ namespace Infrastucture.Data.Config
 
         public void Configure(EntityTypeBuilder<Address> builder)
         {
+            //Key Configurations
+            builder.HasKey(x => x.AddressId);
+            builder.Property(x => x.AddressId)
+            .IsRequired()
+            .ValueGeneratedOnAdd();
 
+
+
+            // Propery Configurations
             builder.Property(x => x.country).IsRequired();
             builder.Property(x => x.city).IsRequired();
             builder.Property(x => x.state).IsRequired();
-            builder.Property(x => x.name).IsRequired();
+            builder.Property(x => x.name)
+            .IsRequired()
+            .HasMaxLength(100)
+            ;
+            
+
 
         }
 

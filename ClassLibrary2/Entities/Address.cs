@@ -6,14 +6,12 @@ namespace ClassLibrary2.Entities
     public class Address
     {
 
-        [Key]
-        [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //[Key]
+        //[Required]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid AddressId { get; set; } 
 
 
-        
-        [MaxLength(100, ErrorMessage = "The length of the Address name should not exceed 100 characters.")]
         public string name { get; set; }
 
         

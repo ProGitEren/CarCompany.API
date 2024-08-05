@@ -15,25 +15,29 @@ namespace ClassLibrary2.Entities
 {
     public class AppUsers : IdentityUser
     {
-        [Required]
+        
         [MaxLength(25, ErrorMessage = " Maximum 25 characters")]
         public string FirstName { get; set; }
 
-        [Required]
+        
         [MaxLength(25,ErrorMessage = " Maximum 25 characters")]
         public string LastName { get; set; }
 
 
-       
+        [Phone(ErrorMessage = "The phone number is not valid.")]
 
-        [Required]
-        [DataType(DataType.DateTime)]
+        public string Phone { get; set; }
+
+    
+        [DataType(DataType.DateTime, ErrorMessage = "The Birth Date is not valid.")]
         public DateTime birthtime { get; set; }
 
         [NotMapped]
         [AllowNull]
         public IList<string> roles { get; set; }
 
+       
+        
         //Navigational Properties
 
         public Guid? AddressId { get; set; }
