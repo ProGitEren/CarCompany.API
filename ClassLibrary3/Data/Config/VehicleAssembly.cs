@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ClassLibrary2.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Entities;
 using System;
@@ -14,6 +15,7 @@ namespace Infrastucture.Data.Config
         public void Configure(EntityTypeBuilder<Vehicles> builder)
         {
             // Key Condiguration
+            
             builder.HasKey(x => x.Vin);
 
             builder.Property(e => e.Vin)
@@ -21,27 +23,44 @@ namespace Infrastucture.Data.Config
                 .HasMaxLength(17)
                 .IsFixedLength();
 
+
             // Instance Requirements 
 
 
-            builder.Property(e => e.Averagefuelin).HasColumnType("decimal(18, 4)");
-            builder.Property(e => e.Averagefuelout).HasColumnType("decimal(18, 4)");
+            builder.Property(e => e.Averagefuelin).HasColumnType("decimal(18, 4)").IsRequired();
+            builder.Property(e => e.Averagefuelout).HasColumnType("decimal(18, 4)").IsRequired();
+            builder.Property(e => e.DrivenKM).IsRequired();
+            builder.Property(e => e.BaggageVolume).IsRequired();
+            builder.Property(e => e.COemmission).IsRequired();
+            builder.Property(e => e.MinWeight).IsRequired();
+            builder.Property(e => e.MaxAllowedWeight).IsRequired();
+            builder.Property(e => e.FuelCapacity).IsRequired();
+            builder.Property(e => e.DrivenKM).IsRequired();
 
+            builder.Property(e => e.EngineId).IsRequired();
+            builder.Property(e => e.ModelId).IsRequired();
+
+
+            //Navigational Configurations
 
             // One-To-Many Relationship
             builder.HasOne(e => e.VehicleModel)
                 .WithMany(vm => vm.Vehicles)
-                .HasForeignKey(e => e.ModelId);
+                .HasForeignKey(e => e.ModelId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // One-To-Many Relationship
             builder.HasOne(e => e.Engine)
                 .WithMany(en => en.Vehicles)
-                .HasForeignKey(e => e.EngineId);
+                .HasForeignKey(e => e.EngineId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // One-TO-One Relationship
+            //One-To-One Relationship
             builder.HasOne(e => e.User)
-                .WithOne(au => au.Vehicle)
-                .HasForeignKey<Vehicles>(e => e.UserId);
+                .WithOne(x => x.Vehicle)
+                .HasForeignKey<AppUsers>(x => x.VehicleId)
+                .OnDelete(DeleteBehavior.NoAction);
+
 
             // Did not seed data as the properties will depend on the Model and Engine inside it therefore seeding will not be done through here as 
             // the objects are deeply relational it will be added cia the controller actions in API then followingly in UI only by ADMIN !!!!!

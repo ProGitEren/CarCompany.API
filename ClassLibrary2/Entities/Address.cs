@@ -30,9 +30,10 @@ namespace ClassLibrary2.Entities
 
         public string country { get; set; }
 
-        //public virtual ICollection<AppUsers> AppUsers { get; set; } // Navigation property
 
+        // Navigation Property
 
+        public virtual AppUsers User { get; set; }
 
 
 

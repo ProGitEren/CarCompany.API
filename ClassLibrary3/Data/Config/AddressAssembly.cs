@@ -23,6 +23,7 @@ namespace Infrastucture.Data.Config
 
 
             // Propery Configurations
+
             builder.Property(x => x.country).IsRequired();
             builder.Property(x => x.city).IsRequired();
             builder.Property(x => x.state).IsRequired();
@@ -30,8 +31,13 @@ namespace Infrastucture.Data.Config
             .IsRequired()
             .HasMaxLength(100)
             ;
-            
 
+            // Navigational Configurations
+
+            builder.HasOne(x => x.User)
+                .WithOne(x => x.Address)
+                .HasForeignKey<AppUsers>(x => x.AddressId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
 

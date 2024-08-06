@@ -31,9 +31,7 @@ namespace Infrastucture.DTO
 
         public string country { get; set; }
 
-        //[Required]
-
-        //public string AppUserId { get; set; } 
+       
 
 
     }

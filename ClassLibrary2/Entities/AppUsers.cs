@@ -19,33 +19,28 @@ namespace ClassLibrary2.Entities
         [MaxLength(25, ErrorMessage = " Maximum 25 characters")]
         public string FirstName { get; set; }
 
-        
         [MaxLength(25,ErrorMessage = " Maximum 25 characters")]
         public string LastName { get; set; }
 
-
-        [Phone(ErrorMessage = "The phone number is not valid.")]
-
+        [RegularExpression("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$", ErrorMessage = "Please enter valid phone no.")]
         public string Phone { get; set; }
 
-    
         [DataType(DataType.DateTime, ErrorMessage = "The Birth Date is not valid.")]
         public DateTime birthtime { get; set; }
 
-        [NotMapped]
-        [AllowNull]
+        //[NotMapped]
+        //[AllowNull]
         public IList<string> roles { get; set; }
 
-       
-        
+
+
         //Navigational Properties
 
         public Guid? AddressId { get; set; }
-
         public virtual Address Address { get; set; }
 
-        public string VehicleId { get; set; }
 
+        public string? VehicleId { get; set; }
         public virtual Vehicles Vehicle { get; set; }
 
 

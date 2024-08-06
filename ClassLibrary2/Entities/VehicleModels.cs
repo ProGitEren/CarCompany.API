@@ -1,4 +1,5 @@
-﻿using Models.Enums;
+﻿using Models.CustomAttributes;
+using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Models.Entities
 {
-    public class VehicleModel : BaseEntity<int>
+    public class VehicleModels : BaseEntity<int>
     {
 
        
@@ -20,22 +21,30 @@ namespace Models.Entities
 
         public string ModelLongName { get; set; }
 
-
+        [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
+
+        [YearRange(1980)]
+        public int ModelYear { get; set; }
 
 
 
         // To be used for VIN
 
+        [CustomAllowedValues(1, 2, 3, 4, 5, 6)]
         public int ManufacturedCountry { get; set; } //1 number
         public string Manufacturer { get; set; } //2 letter
 
+        [ValidCharacters("0123456789ABCDEFGHJKLMNPRSTUVWXYZ")]
         public string securityCode { get; set; } // 1 letter
 
+        [ValidCharacters("ABCDEFGHJKLMNPRSTVWXY1234567890")]
         public string ManufacturedYear { get; set; } // 1 letter
 
+        [ValidCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")]
         public string ManufacturedPlant { get; set; }// 1 letter
 
+        [ValidCharacters("0123456789X")]
         public string CheckDigit { get; set; }
 
 

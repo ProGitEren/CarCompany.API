@@ -34,23 +34,20 @@ namespace Models.Entities
         [Range(0,1000)]
         public int BaggageVolume { get; set; }
 
-
         public int DrivenKM { get; set; }
 
 
 
         // Navigatipnal Property
 
-        public int ModelId { get; set; } // 5 number will be used in vin
+        // Foreign Keys
+        public int? ModelId { get; set; }
+        public int? EngineId { get; set; }
 
-        public virtual VehicleModel VehicleModel { get; set; }
 
-        public int EngineId {  get; set; }
-        
-        public virtual Engine Engine { get; set; }
-
-        public string UserId { get; set; }
-
+        // Navigation Properties
+        public virtual VehicleModels VehicleModel { get; set; }
+        public virtual Engines Engine { get; set; }
         public virtual AppUsers User { get; set; }
 
 
