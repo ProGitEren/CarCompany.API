@@ -26,8 +26,8 @@ namespace Infrastucture.Data.Config
 
             // Instances Configurations
 
-            builder.Property(x => x.Volume).IsRequired();
-            builder.Property(x => x.diameterCm).IsRequired();
+            builder.Property(x => x.Volume).IsRequired().HasColumnType("decimal(18,4)");
+            builder.Property(x => x.diameterCm).IsRequired().HasColumnType("decimal(18,4)");
             builder.Property(x => x.CompressionRatio).IsRequired();
             builder.Property(x => x.Torque).IsRequired();
             builder.Property(x => x.Hp).IsRequired();

@@ -19,9 +19,9 @@ namespace Infrastucture.Data.Config
             builder.HasKey(x => x.Vin);
 
             builder.Property(e => e.Vin)
-                .IsRequired().ValueGeneratedOnAdd();
-                //.HasMaxLength(17)
-                //.IsFixedLength();
+                .IsRequired()
+                .HasMaxLength(17)
+                .IsFixedLength();
 
 
             // Instance Requirements 
@@ -39,6 +39,11 @@ namespace Infrastucture.Data.Config
 
             builder.Property(e => e.EngineId).IsRequired();
             builder.Property(e => e.ModelId).IsRequired();
+
+
+            builder.Property(x => x.ModelId).IsRequired(false);
+            builder.Property(x => x.EngineId).IsRequired(false);
+
 
 
             //Navigational Configurations

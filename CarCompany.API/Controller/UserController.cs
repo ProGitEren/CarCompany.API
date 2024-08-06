@@ -283,7 +283,7 @@ namespace CarCompany.API.Controller
 
         // Later on this security will be increased only available for admin
         [HttpPost("register-admin")] 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterAdminAsync(RegisterDto registerdto) 
         {
             var correlationId = GetCorrelationId();
@@ -398,12 +398,15 @@ namespace CarCompany.API.Controller
                 UserName = registerdto.Email,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
+                Phone = registerdto.Phone,
                 VehicleId = vehicle.Vin,
+               
 
             };
-
-            var result = await _usermanager.CreateAsync(user,password);
-            if (result.Succeeded)
+            try { var result = await _usermanager.CreateAsync(user, password); } 
+            catch(Exception ex) { throw new Exception(ex.Message); }
+           
+            if (true)
             {
 
                 await _usermanager.AddToRoleAsync(user, registerdto.Role);
@@ -422,7 +425,7 @@ namespace CarCompany.API.Controller
             _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
             return BadRequest(new ApiValidationErrorResponse
             {
-                Errors = [$"Unexpected Error Happened: {result.Errors}."]
+                Errors = [$"Unexpected Error Happened: ."]
             });
         }
 

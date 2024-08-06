@@ -11,7 +11,9 @@ namespace Infrastucture.DTO
 {
     public class RegisterVehicleDto
     {
-        
+        [Required]
+
+        public string? Vin {  get; set; }
 
         [Required]
         public decimal Averagefuelin { get; set; }
