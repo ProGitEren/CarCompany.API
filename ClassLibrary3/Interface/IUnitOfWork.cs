@@ -10,6 +10,7 @@ namespace Infrastucture.Interface
     {
         public IAddressRepository AddressRepository { get; }
 
+        public IVehicleRepository VehicleRepository { get; }
        
     }
 }

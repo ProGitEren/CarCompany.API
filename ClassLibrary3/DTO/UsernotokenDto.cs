@@ -18,9 +18,18 @@ namespace Infrastucture.DTO
 
         [Required]
         public string LastName { get; set; }
+        
+        [Required]
+
+        public AddressDto AddressDto { get; set; }
 
         [Required]
-        public AddressDto AddressDto { get; set; }
+
+        public VehicleDto VehicleDto { get; set; }
+
+        [Required]
+
+        public string Phone { get; set; }
 
         [Required]
         

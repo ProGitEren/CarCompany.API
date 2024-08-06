@@ -22,16 +22,21 @@ namespace Infrastucture.DTO
         [MaxLength(25, ErrorMessage = " Maximum 25 characters")]
         public string LastName { get; set; }
 
+        [RegularExpression("^(?!0+$)(\\+\\d{1,3}[- ]?)?(?!0+$)\\d{10,15}$", ErrorMessage = "Please enter valid phone no.")]
+        public string Phone { get; set; }
+
         [Required]
         public DateTime birthtime { get; set; }
 
         [Required]
         public string EncryptedPassword { get; set; }
 
-        
-
         [Required]
         public RegisterAddressDto Address { get; set; }
+
+        [Required]
+
+        public RegisterVehicleDto Vehicle { get; set; }
 
         [Required]
         public string Role { get; set; }

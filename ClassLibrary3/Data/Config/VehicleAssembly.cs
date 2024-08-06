@@ -19,9 +19,9 @@ namespace Infrastucture.Data.Config
             builder.HasKey(x => x.Vin);
 
             builder.Property(e => e.Vin)
-                .IsRequired()
-                .HasMaxLength(17)
-                .IsFixedLength();
+                .IsRequired().ValueGeneratedOnAdd();
+                //.HasMaxLength(17)
+                //.IsFixedLength();
 
 
             // Instance Requirements 

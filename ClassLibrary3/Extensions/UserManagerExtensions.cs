@@ -17,13 +17,14 @@ namespace Infrastucture.Extensions
     public static class UserManagerExtensions
     {
 
-        public static async Task<AppUsers> FindEmailByClaimAsyncWithAddress(this UserManager<AppUsers> userManager, ClaimsPrincipal user)
+        public static async Task<AppUsers> FindEmailByClaimIncluded(this UserManager<AppUsers> userManager, ClaimsPrincipal user)
         {
             var email = user?.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
 
             var appUser = await userManager.Users
             .Include(x => x.Address)
+            .Include(x => x.Vehicle)
             .SingleOrDefaultAsync(x => x.Email == email);
 
             return appUser;
@@ -60,10 +61,13 @@ namespace Infrastucture.Extensions
 
         }
 
-        public static async Task<IList<AppUsers?>> GetAllUsersWithAddress(this UserManager<AppUsers> userManager)
+        public static async Task<IList<AppUsers?>> GetAllUsersIncluded(this UserManager<AppUsers> userManager)
         {
 
-            var users = await userManager.Users.Include(x => x.Address).ToListAsync();
+            var users = await userManager.Users
+                .Include(x => x.Address)
+                .Include(x => x.Vehicle)
+                .ToListAsync();
 
 
             return users;

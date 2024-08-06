@@ -17,11 +17,13 @@ namespace Infrastucture.Repository
 
         public IAddressRepository AddressRepository { get; }
 
+        public IVehicleRepository VehicleRepository { get; }
+
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
 
-            
+            VehicleRepository = new VehicleRepository(_context);
             AddressRepository = new AddressRepository(_context);
 
 

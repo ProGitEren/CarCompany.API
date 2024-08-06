@@ -25,9 +25,9 @@ namespace Infrastucture.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid? AddressId)
+        public async Task DeleteAsync(Guid? Id)
         {
-            var entity = await _context.Set<T>().FindAsync(AddressId);
+            var entity = await _context.Set<T>().FindAsync(Id);
             _context.Set<T>().Remove(entity);
             await _context.SaveChangesAsync();
         }

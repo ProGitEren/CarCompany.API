@@ -17,6 +17,7 @@ using System.Security.Claims;
 using Serilog;
 using Infrastucture.DTO.Infrastucture.DTO;
 using WebAPI.Validation;
+using Models.Entities;
 
 
 
@@ -218,6 +219,7 @@ namespace CarCompany.API.Controller
             }
 
             var address = _mapper.Map<Address>(registerdto.Address);
+            var vehicle = _mapper.Map<Vehicles>(registerdto.Vehicle);
             try
             {
                 await _uow.AddressRepository.AddAsync(address);
@@ -228,6 +230,18 @@ namespace CarCompany.API.Controller
             {
                 throw new Exception(ex.Message);
             }
+            
+            try
+            {
+                await _uow.VehicleRepository.AddAsync(vehicle);
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
 
 
             var user = new AppUsers
@@ -238,6 +252,7 @@ namespace CarCompany.API.Controller
                 UserName = registerdto.Email,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
+                VehicleId = vehicle.Vin,
                
             };
        
@@ -258,6 +273,7 @@ namespace CarCompany.API.Controller
             }
 
             await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
+            await _uow.VehicleRepository.DeleteAsync(vehicle.Vin); // if the user registration failed address should be removed as well
             _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
             return BadRequest(new ApiValidationErrorResponse
             {
@@ -350,9 +366,21 @@ namespace CarCompany.API.Controller
             //}
 
             var address = _mapper.Map<Address>(registerdto.Address);
+            var vehicle = _mapper.Map<Vehicles>(registerdto.Vehicle);
             try
             {
                 await _uow.AddressRepository.AddAsync(address);
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            try
+            {
+                await _uow.VehicleRepository.AddAsync(vehicle);
 
 
             }
@@ -370,6 +398,7 @@ namespace CarCompany.API.Controller
                 UserName = registerdto.Email,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
+                VehicleId = vehicle.Vin,
 
             };
 
@@ -389,6 +418,7 @@ namespace CarCompany.API.Controller
             }
 
             await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
+            await _uow.VehicleRepository.DeleteAsync(vehicle.Vin); // if the user registration failed address should be removed as well
             _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
             return BadRequest(new ApiValidationErrorResponse
             {
@@ -526,7 +556,7 @@ namespace CarCompany.API.Controller
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving current user with address, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.FindEmailByClaimAsyncWithAddress(User);
+            var user = await _usermanager.FindEmailByClaimIncluded(User);
             user = await _usermanager.AddRolestoUserAsync(user);
 
             if (user == null)
@@ -550,7 +580,7 @@ namespace CarCompany.API.Controller
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving user address, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.FindEmailByClaimAsyncWithAddress(User);
+            var user = await _usermanager.FindEmailByClaimIncluded(User);
             if (user == null)
             {
                 _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
@@ -650,7 +680,7 @@ namespace CarCompany.API.Controller
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving all users with address, CorrelationId: {CorrelationId}", correlationId);
 
-            var users = await _usermanager.GetAllUsersWithAddress();
+            var users = await _usermanager.GetAllUsersIncluded();
             var userswithrole = await _usermanager.AddRolestoListAsync(users);
             
             if (users != null)
