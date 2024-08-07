@@ -282,9 +282,11 @@ namespace CarCompany.API.Controller
 
         }
 
-        // Later on this security will be increased only available for admin
+        
+
         [HttpPost("register-admin")]
         [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> RegisterAdminAsync(RegisterDto registerdto) 
         {
             var correlationId = GetCorrelationId();
@@ -392,6 +394,7 @@ namespace CarCompany.API.Controller
                 Phone = registerdto.Phone,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
+
             };
 
             var validationerrorlist = EntityValidator.GetValidationResults(user);
