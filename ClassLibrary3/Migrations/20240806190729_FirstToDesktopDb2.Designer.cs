@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240723133328_newattribute")]
-    partial class newattribute
+    [Migration("20240806190729_FirstToDesktopDb2")]
+    partial class FirstToDesktopDb2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,7 +53,7 @@ namespace Infrastucture.Migrations
 
                     b.HasKey("AddressId");
 
-                    b.ToTable("addresses");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("ClassLibrary2.Entities.AppUsers", b =>
@@ -105,6 +105,11 @@ namespace Infrastucture.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -121,8 +126,14 @@ namespace Infrastucture.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("VehicleId")
+                        .HasColumnType("nchar(17)");
+
                     b.Property<DateTime>("birthtime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("roles")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -137,6 +148,10 @@ namespace Infrastucture.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("VehicleId")
+                        .IsUnique()
+                        .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -274,14 +289,170 @@ namespace Infrastucture.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Models.Entities.Engines", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompressionRatio")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Hp")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Torque")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("diameterCm")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Engines");
+                });
+
+            modelBuilder.Entity("Models.Entities.VehicleModels", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CheckDigit")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nchar(1)")
+                        .IsFixedLength();
+
+                    b.Property<int>("ManufacturedCountry")
+                        .HasMaxLength(1)
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManufacturedPlant")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nchar(1)")
+                        .IsFixedLength();
+
+                    b.Property<string>("ManufacturedYear")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nchar(1)")
+                        .IsFixedLength();
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nchar(2)")
+                        .IsFixedLength();
+
+                    b.Property<string>("ModelCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nchar(6)")
+                        .IsFixedLength();
+
+                    b.Property<string>("ModelLongName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ModelShortName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("ModelYear")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("securityCode")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nchar(1)")
+                        .IsFixedLength();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VehicleModels");
+                });
+
+            modelBuilder.Entity("Models.Entities.Vehicles", b =>
+                {
+                    b.Property<string>("Vin")
+                        .HasMaxLength(17)
+                        .HasColumnType("nchar(17)")
+                        .IsFixedLength();
+
+                    b.Property<decimal>("Averagefuelin")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("Averagefuelout")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<int>("BaggageVolume")
+                        .HasColumnType("int");
+
+                    b.Property<int>("COemmission")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DrivenKM")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EngineId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FuelCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxAllowedWeight")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinWeight")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ModelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Vin");
+
+                    b.HasIndex("EngineId");
+
+                    b.HasIndex("ModelId");
+
+                    b.ToTable("Vehicles");
+                });
+
             modelBuilder.Entity("ClassLibrary2.Entities.AppUsers", b =>
                 {
                     b.HasOne("ClassLibrary2.Entities.Address", "Address")
-                        .WithOne()
+                        .WithOne("User")
                         .HasForeignKey("ClassLibrary2.Entities.AppUsers", "AddressId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Models.Entities.Vehicles", "Vehicle")
+                        .WithOne("User")
+                        .HasForeignKey("ClassLibrary2.Entities.AppUsers", "VehicleId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.Navigation("Address");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -332,6 +503,45 @@ namespace Infrastucture.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.Entities.Vehicles", b =>
+                {
+                    b.HasOne("Models.Entities.Engines", "Engine")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("EngineId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Models.Entities.VehicleModels", "VehicleModel")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("ModelId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Engine");
+
+                    b.Navigation("VehicleModel");
+                });
+
+            modelBuilder.Entity("ClassLibrary2.Entities.Address", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.Entities.Engines", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Models.Entities.VehicleModels", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Models.Entities.Vehicles", b =>
+                {
+                    b.Navigation("User")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

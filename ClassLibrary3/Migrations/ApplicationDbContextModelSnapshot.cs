@@ -124,7 +124,7 @@ namespace Infrastucture.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("VehicleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nchar(17)");
 
                     b.Property<DateTime>("birthtime")
                         .HasColumnType("datetime2");
@@ -304,10 +304,10 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Volume")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("diameterCm")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -392,8 +392,9 @@ namespace Infrastucture.Migrations
             modelBuilder.Entity("Models.Entities.Vehicles", b =>
                 {
                     b.Property<string>("Vin")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(17)
+                        .HasColumnType("nchar(17)")
+                        .IsFixedLength();
 
                     b.Property<decimal>("Averagefuelin")
                         .HasColumnType("decimal(18, 4)");
@@ -411,7 +412,6 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("EngineId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int>("FuelCapacity")
@@ -424,7 +424,6 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("ModelId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.HasKey("Vin");
@@ -509,14 +508,12 @@ namespace Infrastucture.Migrations
                     b.HasOne("Models.Entities.Engines", "Engine")
                         .WithMany("Vehicles")
                         .HasForeignKey("EngineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Models.Entities.VehicleModels", "VehicleModel")
                         .WithMany("Vehicles")
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Engine");
 

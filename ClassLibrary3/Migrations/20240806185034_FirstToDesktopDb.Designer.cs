@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240806114118_VehicleInfrastructure")]
-    partial class VehicleInfrastructure
+    [Migration("20240806185034_FirstToDesktopDb")]
+    partial class FirstToDesktopDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -307,10 +307,10 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Volume")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("diameterCm")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
