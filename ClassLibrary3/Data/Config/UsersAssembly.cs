@@ -29,8 +29,10 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.roles).IsRequired(false);
 
             builder.Property(x => x.VehicleId).IsRequired(false);
+            builder.Property(x => x.AddressId).IsRequired(false);
 
-            
+
+
             // Relational Configurations
 
             builder

@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
-using Infrastucture.DTO;
 using Infrastucture.Errors;
 using Infrastucture.Extensions;
-using Infrastucture.Interface;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;    
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,6 +16,16 @@ using Serilog;
 using Infrastucture.DTO.Infrastucture.DTO;
 using WebAPI.Validation;
 using Models.Entities;
+using Infrastucture.Interface.Repository_Interfaces;
+using Infrastucture.Interface.Service_Interfaces;
+using Infrastucture.Repository;
+using Infrastucture.Services;
+using System.Linq.Expressions;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net;
+using Infrastucture.DTO.Dto_Users;
+using Infrastucture.DTO.Dto_Address;
+
 
 
 
@@ -39,12 +47,12 @@ namespace CarCompany.API.Controller
         private readonly RoleManager<IdentityRole> _rolemanager;
         private readonly IPasswordHasher<AppUsers> _passwordhasher;
         private readonly EncryptionService _encryptionservice;
-        //private readonly UsersPasswordValidation _passwordvalidator;
+        private readonly IVinGenerationService _vingenerationservice;
 
         public UserController(SignInManager<AppUsers> signinmanager, UserManager<AppUsers> usermanager, IMapper mapper,
             ITokenServices tokenServices, IUnitOfWork uow, IOptions<IdentityOptions> options,
             Serilog.ILogger logger, IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> rolemanager,
-            IPasswordHasher<AppUsers> passwordHasher,EncryptionService encryptionService/*, UsersPasswordValidation passwordvalidator*/)
+            IPasswordHasher<AppUsers> passwordHasher,EncryptionService encryptionService, IVinGenerationService vinGenerationService)
         {
             _signinmanager = signinmanager;
             _usermanager = usermanager;
@@ -58,7 +66,8 @@ namespace CarCompany.API.Controller
             _httpcontextAccessor.HttpContext = _httpcontextAccessor.HttpContext;
             _passwordhasher = passwordHasher;
             _encryptionservice = encryptionService;
-            //_passwordvalidator = passwordvalidator;
+            _vingenerationservice = vinGenerationService;
+           
              
          }
 
@@ -169,19 +178,13 @@ namespace CarCompany.API.Controller
                 });
             }
 
-            if (!await IsPasswordUnique(password))
+            if (!await _usermanager.IsPasswordUniqueAsync(password, _logger, _passwordhasher, correlationId))
             {
                 _logger.Warning("Registration failed for {Email}: Password already in use, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
                 return new BadRequestObjectResult(new ApiValidationErrorResponse
                 {
                     Errors = ["This password is already in use."]
                 });
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.Warning("Registration failed for {Email}: Model state invalid, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return BadRequest(ModelState);
             }
 
             var passwordvalidationresult =  PasswordValidation.ValidatePassword(password);
@@ -219,30 +222,15 @@ namespace CarCompany.API.Controller
             }
 
             var address = _mapper.Map<Address>(registerdto.Address);
-            var vehicle = _mapper.Map<Vehicles>(registerdto.Vehicle);
+            
             try
             {
                 await _uow.AddressRepository.AddAsync(address);
-
-
             }
             catch (Exception ex) 
             {
                 throw new Exception(ex.Message);
             }
-            
-            try
-            {
-                await _uow.VehicleRepository.AddAsync(vehicle);
-
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-
 
             var user = new AppUsers
             {
@@ -250,39 +238,52 @@ namespace CarCompany.API.Controller
                 LastName = registerdto.LastName,
                 Email = registerdto.Email,
                 UserName = registerdto.Email,
+                Phone = registerdto.Phone,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
-                VehicleId = vehicle.Vin,
-               
             };
-       
-            
-            var result = await _usermanager.CreateAsync(user,password);
-            if (result.Succeeded)
+
+            var validationerrorlist = EntityValidator.GetValidationResults(user);
+
+            if (validationerrorlist.Any())
             {
-                
-                await _usermanager.AddToRoleAsync(user, registerdto.Role);
-                _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role ,correlationId);
-                return Ok(new UserDto
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
+
+            try
+            {
+                var result = await _usermanager.CreateAsync(user, password);
+                if (result.Succeeded)
                 {
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Token = await _tokenservices.CreateToken(user)
-                });
+
+                    await _usermanager.AddToRoleAsync(user, registerdto.Role);
+                    _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role, correlationId);
+                    return Ok(new UserDto
+                    {
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Token = await _tokenservices.CreateToken(user)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
+                throw new Exception(ex.Message); // Internal Server Error
             }
 
             await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-            await _uow.VehicleRepository.DeleteAsync(vehicle.Vin); // if the user registration failed address should be removed as well
             _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
             return BadRequest(new ApiValidationErrorResponse
             {
-                Errors = ["Unexpected Error Hapoened."]
+                Errors = [$"Unexpected Error Happened: ."]
             });
+
         }
 
         // Later on this security will be increased only available for admin
-        [HttpPost("register-admin")] 
+        [HttpPost("register-admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterAdminAsync(RegisterDto registerdto) 
         {
@@ -314,8 +315,8 @@ namespace CarCompany.API.Controller
                     Errors = ["This Email is already taken"]
                 });
             }
-
-            if (!await IsPasswordUnique(password))
+          
+            if (!await _usermanager.IsPasswordUniqueAsync(password,_logger,_passwordhasher,correlationId))
             {
                 _logger.Warning("Registration failed for {Email}: Password already in use, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
                 return new BadRequestObjectResult(new ApiValidationErrorResponse
@@ -366,7 +367,8 @@ namespace CarCompany.API.Controller
             //}
 
             var address = _mapper.Map<Address>(registerdto.Address);
-            var vehicle = _mapper.Map<Vehicles>(registerdto.Vehicle);
+            
+            
             try
             {
                 await _uow.AddressRepository.AddAsync(address);
@@ -378,16 +380,7 @@ namespace CarCompany.API.Controller
                 throw new Exception(ex.Message);
             }
 
-            try
-            {
-                await _uow.VehicleRepository.AddAsync(vehicle);
-
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            
 
 
             var user = new AppUsers
@@ -396,33 +389,46 @@ namespace CarCompany.API.Controller
                 LastName = registerdto.LastName,
                 Email = registerdto.Email,
                 UserName = registerdto.Email,
+                Phone = registerdto.Phone,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
-                VehicleId = vehicle.Vin,
-
             };
 
-            var result = await _usermanager.CreateAsync(user,password);
-            if (result.Succeeded)
-            {
+            var validationerrorlist = EntityValidator.GetValidationResults(user);
 
-                await _usermanager.AddToRoleAsync(user, registerdto.Role);
-                _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role, correlationId);
-                return Ok(new UserDto
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
+
+            try
+            {
+                var result = await _usermanager.CreateAsync(user, password);
+                if (result.Succeeded)
                 {
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Token = await _tokenservices.CreateToken(user)
-                });
+
+                    await _usermanager.AddToRoleAsync(user, registerdto.Role);
+                    _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role, correlationId);
+                    return Ok(new UserDto
+                    {
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Token = await _tokenservices.CreateToken(user)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
+                throw new Exception(ex.Message); // Internal Server Error
             }
 
             await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-            await _uow.VehicleRepository.DeleteAsync(vehicle.Vin); // if the user registration failed address should be removed as well
             _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
             return BadRequest(new ApiValidationErrorResponse
             {
-                Errors = [$"Unexpected Error Happened: {result.Errors}."]
+                Errors = [$"Unexpected Error Happened: ."]
             });
         }
 
@@ -529,7 +535,7 @@ namespace CarCompany.API.Controller
 
         [Authorize]
         [HttpGet("get-current-user")]
-        public async Task<ActionResult> GetCurrentUser()
+        public async Task<ActionResult> GetCurrentUserAsync()
         {
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving current user, CorrelationId: {CorrelationId}", correlationId);
@@ -550,13 +556,13 @@ namespace CarCompany.API.Controller
         }
 
         [Authorize]
-        [HttpGet("get-current-user-with-Address")]
-        public async Task<ActionResult> GetCurrentUserWithAddress()
+        [HttpGet("get-current-user-with-Detail")]
+        public async Task<ActionResult> GetCurrentUserWithDetaisAsync()
         {
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving current user with address, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.FindEmailByClaimIncluded(User);
+            var user = await _usermanager.FindEmailByClaimWithDetailAsync(User);
             user = await _usermanager.AddRolestoUserAsync(user);
 
             if (user == null)
@@ -566,7 +572,7 @@ namespace CarCompany.API.Controller
             }
 
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var userwithaddressdto = _mapper.Map<UserwithaddressDto>(user);
+            var userwithaddressdto = _mapper.Map<UserwithdetailsDto>(user);
             userwithaddressdto.Token = token;
 
             _logger.Information("Current user with address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
@@ -580,7 +586,7 @@ namespace CarCompany.API.Controller
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving user address, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.FindEmailByClaimIncluded(User);
+            var user = await _usermanager.FindEmailByClaimWithDetailAsync(User);
             if (user == null)
             {
                 _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
@@ -600,14 +606,22 @@ namespace CarCompany.API.Controller
             var correlationId = GetCorrelationId();
             _logger.Information("Updating user address, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.Users.Where(x => x.AddressId == addressdto.AddressId).FirstOrDefaultAsync(); // find the user assigned to the address
+            var user = await _usermanager.Users.Where(x => x.AddressId == addressdto.AddressId).Include(x=> x.Address).FirstOrDefaultAsync(); // find the user assigned to the address
             if (user == null)
             {
                 _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
                 return Unauthorized(new ApiException(401, "The current user is not authenticated."));
             }
+            
+            _mapper.Map(addressdto, user.Address);
+            var validationerrorlist = EntityValidator.GetValidationResults(user.Address);
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
 
-            await _uow.AddressRepository.UpdateAsync(_mapper.Map(addressdto, user.Address));
+
+            await _uow.AddressRepository.UpdateAsync(user.Address);
             var result = await _usermanager.UpdateAsync(user);
 
             if (result.Succeeded)
@@ -624,7 +638,6 @@ namespace CarCompany.API.Controller
         }
 
        
-
         [Authorize]
         [HttpGet("get-Address-by-id/{Id}")]
         public async Task<ActionResult> GetAddressById(Guid Id)
@@ -654,15 +667,14 @@ namespace CarCompany.API.Controller
         }
 
 
-
         [Authorize(Roles = "Admin")]
         [HttpGet("get-all-users")]
-        public async Task<ActionResult> GetAll()
+        public async Task<ActionResult> GetAllAsync()
         {
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving all users, CorrelationId: {CorrelationId}", correlationId);
 
-            var users = await _usermanager.GetAllUsers();
+            var users = await _usermanager.GetAllUsersAsync();
             if (users != null)
             {
                 _logger.Information("All users retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
@@ -674,13 +686,13 @@ namespace CarCompany.API.Controller
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("get-all-users-with-Address")]
-        public async Task<ActionResult> GetAllWithAddress()
+        [HttpGet("get-all-users-with-Detail")]
+        public async Task<ActionResult> GetAllWithDetailsAsync()
         {
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving all users with address, CorrelationId: {CorrelationId}", correlationId);
 
-            var users = await _usermanager.GetAllUsersIncluded();
+            var users = await _usermanager.GetAllUsersWithDetailsAsync();
             var userswithrole = await _usermanager.AddRolestoListAsync(users);
             
             if (users != null)
@@ -778,8 +790,8 @@ namespace CarCompany.API.Controller
         }
 
         [Authorize]
-        [HttpGet("get-user-by-email-with-Address/{email}")]
-        public async Task<ActionResult> GetUserWithEmailWithAddress(string? email)
+        [HttpGet("get-user-by-email-with-Detail/{email}")]
+        public async Task<ActionResult> GetUserWithEmailWithDetail(string? email)
         {
             var correlationId = GetCorrelationId();
             _logger.Information("Retrieving user by email with address {Email}, CorrelationId: {CorrelationId}", email, correlationId);
@@ -793,7 +805,7 @@ namespace CarCompany.API.Controller
                 });
             }
 
-            var user = await _usermanager.Users.Where(x => x.Email == email).Include(y => y.Address).FirstOrDefaultAsync();
+            var user = await _usermanager.Users.Where(x => x.Email == email).Include(y => y.Address).Include(x=> x.Vehicle).FirstOrDefaultAsync();
             user = await _usermanager.AddRolestoUserAsync(user);
 
             if (user != null)
@@ -823,9 +835,13 @@ namespace CarCompany.API.Controller
             }
 
             _mapper.Map(userdto, user);
-            user.UserName = user.Email;
+            var validationerrorlist = EntityValidator.GetValidationResults(user);
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
 
-            
+            user.UserName = user.Email;
 
             var result = await _usermanager.UpdateAsync(user);
             if (result.Succeeded)
@@ -848,56 +864,56 @@ namespace CarCompany.API.Controller
             });
         }
 
-        [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword(PasswordChangeDto dto)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Changing password, CorrelationId: {CorrelationId}", correlationId);
+        //[HttpPut("change-password")]
+        //public async Task<IActionResult> ChangePassword(PasswordChangeDto dto)
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Changing password, CorrelationId: {CorrelationId}", correlationId);
 
-            if (!ModelState.IsValid)
-            {
-                _logger.Warning("Model state invalid for password change, CorrelationId: {CorrelationId}", correlationId);
-                return BadRequest(ModelState);
-            }
+        //    if (!ModelState.IsValid)
+        //    {
+        //        _logger.Warning("Model state invalid for password change, CorrelationId: {CorrelationId}", correlationId);
+        //        return BadRequest(ModelState);
+        //    }
 
-            var user = await _usermanager.FindEmailByClaimAsync(User);
-            if (user == null)
-            {
-                _logger.Warning("User not authorized for password change, CorrelationId: {CorrelationId}", correlationId);
-                return Unauthorized(new ApiException(401, "You are not authorized"));
-            }
+        //    var user = await _usermanager.FindEmailByClaimAsync(User);
+        //    if (user == null)
+        //    {
+        //        _logger.Warning("User not authorized for password change, CorrelationId: {CorrelationId}", correlationId);
+        //        return Unauthorized(new ApiException(401, "You are not authorized"));
+        //    }
 
-            if (!await IsPasswordUnique(dto.NewPassword))
-            {
-                _logger.Warning("Password change failed: Password already in use, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["This password is already in use."]
-                });
-            }
+        //    if (!await _usermanager.IsPasswordUniqueAsync(dto.NewPassword, _logger, _passwordhasher, correlationId))
+        //    {
+        //        _logger.Warning("Registration failed : Password already in use, CorrelationId: {CorrelationId}", correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["This password is already in use."]
+        //        });
+        //    }
 
-            if (dto.NewPassword != dto.ConfirmPassword)
-            {
-                _logger.Warning("Password change failed: Confirmation password does not match new password, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["Confirmation Password do not match with new password."]
-                });
-            }
+        //    if (dto.NewPassword != dto.ConfirmPassword)
+        //    {
+        //        _logger.Warning("Password change failed: Confirmation password does not match new password, CorrelationId: {CorrelationId}", correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["Confirmation Password do not match with new password."]
+        //        });
+        //    }
 
-            var changePasswordResult = await _usermanager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
-            if (!changePasswordResult.Succeeded)
-            {
-                _logger.Error("Problem in changing password, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["Problem in changing the password."]
-                });
-            }
+        //    var changePasswordResult = await _usermanager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+        //    if (!changePasswordResult.Succeeded)
+        //    {
+        //        _logger.Error("Problem in changing password, CorrelationId: {CorrelationId}", correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["Problem in changing the password."]
+        //        });
+        //    }
 
-            _logger.Information("Password changed successfully, CorrelationId: {CorrelationId}", correlationId);
-            return Ok("Password changed successfully.");
-        }
+        //    _logger.Information("Password changed successfully, CorrelationId: {CorrelationId}", correlationId);
+        //    return Ok("Password changed successfully.");
+        //}
 
         [Authorize]
         [HttpDelete("delete-user/{email}")]
@@ -914,6 +930,7 @@ namespace CarCompany.API.Controller
             }
 
             var addressId = user.AddressId;
+            var vehicleId = user.VehicleId;
             var result = await _usermanager.DeleteAsync(user);
 
             if (result.Succeeded)
@@ -921,7 +938,8 @@ namespace CarCompany.API.Controller
                 try
                 {
                     await _uow.AddressRepository.DeleteAsync(addressId);
-                    _logger.Information("User and address deleted successfully, CorrelationId: {CorrelationId}", correlationId);
+                    await _uow.VehicleRepository.DeleteAsync(vehicleId);
+                    _logger.Information("User,vehicle and address deleted successfully, CorrelationId: {CorrelationId}", correlationId);
                     return Ok("The user and the address successfully deleted.");
                 }
                 catch (Exception ex)
@@ -973,72 +991,52 @@ namespace CarCompany.API.Controller
             }
         }
 
-        [Authorize]
-        [HttpPost("create-user-address/{id}")]
-        public async Task<ActionResult> CreateUserAddress(string? id, AddressDto addressdto)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Creating address for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
+        //[Authorize]
+        //[HttpPost("create-user-address/{id}")]
+        //public async Task<ActionResult> CreateUserAddress(string? id, AddressDto addressdto)
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Creating address for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
 
-            var user = await _usermanager.FindByIdAsync(id);
-            if (user == null)
-            {
-                _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", id, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The user with this id could not retrieved."]
-                });
-            }
+        //    var user = await _usermanager.FindByIdAsync(id);
+        //    if (user == null)
+        //    {
+        //        _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", id, correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["The user with this id could not retrieved."]
+        //        });
+        //    }
 
-            if (user.AddressId != null)
-            {
-                _logger.Warning("User with Id {Id} already has an address, CorrelationId: {CorrelationId}", id, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The user already has an existing address, if you want to change it go to the related section."]
-                });
-            }
+        //    if (user.AddressId != null)
+        //    {
+        //        _logger.Warning("User with Id {Id} already has an address, CorrelationId: {CorrelationId}", id, correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["The user already has an existing address, if you want to change it go to the related section."]
+        //        });
+        //    }
 
-            var address = _mapper.Map<Address>(addressdto);
-            await _uow.AddressRepository.AddAsync(address);
+        //    var address = _mapper.Map<Address>(addressdto);
+        //    await _uow.AddressRepository.AddAsync(address);
 
-            user.AddressId = address.AddressId;
-            var result = await _usermanager.UpdateAsync(user);
+        //    user.AddressId = address.AddressId;
+        //    var result = await _usermanager.UpdateAsync(user);
 
-            if (result.Succeeded)
-            {
-                _logger.Information("Address created successfully for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
-                return Ok(_mapper.Map<AddressDto>(user.Address));
-            }
+        //    if (result.Succeeded)
+        //    {
+        //        _logger.Information("Address created successfully for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
+        //        return Ok(_mapper.Map<AddressDto>(user.Address));
+        //    }
 
-            _logger.Error("Problem in updating user with new address {Id}, CorrelationId: {CorrelationId}", id, correlationId);
-            return new BadRequestObjectResult(new ApiValidationErrorResponse
-            {
-                Errors = ["Problem in updating the user."]
-            });
-        }
+        //    _logger.Error("Problem in updating user with new address {Id}, CorrelationId: {CorrelationId}", id, correlationId);
+        //    return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //    {
+        //        Errors = ["Problem in updating the user."]
+        //    });
+        //}
 
-        private async Task<bool> IsPasswordUnique(string password)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Checking if password is unique, CorrelationId: {CorrelationId}", correlationId);
-
-            
-            var users = await _usermanager.Users.ToListAsync();
-
-            foreach (var user in users) 
-            {
-                var verificationResult = _passwordhasher.VerifyHashedPassword(user, user.PasswordHash, password);
-                if (verificationResult == PasswordVerificationResult.Success)
-                {
-                    _logger.Warning("Password is not unique, CorrelationId: {CorrelationId}", correlationId);
-                    return false; // Password is not unique
-                }
-            }
-
-            _logger.Information("Password is unique, CorrelationId: {CorrelationId}", correlationId);
-            return true;
-        }
+       
 
     }
 }

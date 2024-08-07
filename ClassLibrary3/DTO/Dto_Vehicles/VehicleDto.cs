@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Infrastucture.DTO.Dto_Vehicles
+{
+    public class VehicleDto
+    {
+
+
+        public string Vin { get; set; }
+
+        public decimal Averagefuelin { get; set; }
+
+        public decimal Averagefuelout { get; set; }
+
+        public int COemmission { get; set; }
+
+        public int FuelCapacity { get; set; }
+
+        public int MaxAllowedWeight { get; set; }
+
+        public int MinWeight { get; set; }
+
+        public int BaggageVolume { get; set; }
+
+        public int DrivenKM { get; set; }
+
+
+
+    }
+}

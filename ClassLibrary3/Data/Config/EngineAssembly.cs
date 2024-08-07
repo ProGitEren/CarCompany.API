@@ -20,17 +20,19 @@ namespace Infrastucture.Data.Config
             builder.HasKey(x => x.Id);
 
             builder.Property(u => u.Id)
-                   .HasValueGenerator<CustomIdValueGenerator>() // Use custom value generator
+                   .HasValueGenerator<CustomIdValueGenerator<Engines>>() // Use custom value generator
                    .IsRequired();
 
 
             // Instances Configurations
 
-            builder.Property(x => x.Volume).IsRequired();
-            builder.Property(x => x.diameterCm).IsRequired();
+            builder.Property(x => x.Volume).IsRequired().HasColumnType("decimal(18,4)");
+            builder.Property(x => x.diameterCm).IsRequired().HasColumnType("decimal(18,4)");
             builder.Property(x => x.CompressionRatio).IsRequired();
             builder.Property(x => x.Torque).IsRequired();
             builder.Property(x => x.Hp).IsRequired();
+
+            builder.Property(x => x.EngineCode).IsRequired().HasColumnType("nchar(6)");
 
 
             // Navigational Configurations
@@ -39,6 +41,26 @@ namespace Infrastucture.Data.Config
                 .WithOne(x => x.Engine)
                 .HasForeignKey(y => y.EngineId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+
+            // Seed Data
+
+            builder.HasData(
+                new Engines 
+                {
+                    Id = 1000,
+                    Volume = 1000,
+                    Hp = 200,
+                    Torque = 250,
+                    CompressionRatio = 5,
+                    diameterCm = 55,
+                    EngineCode = "AB1234"
+
+                }
+                
+                
+                
+                );
 
         }
     }

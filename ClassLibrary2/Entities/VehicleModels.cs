@@ -15,7 +15,7 @@ namespace Models.Entities
        
         public VehicleType VehicleType { get; set; }
 
-        public string ModelCode { get; set; }
+        public string EngineCode { get; set; }
 
         public string ModelShortName { get; set; }
 

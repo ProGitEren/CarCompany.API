@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
-using Infrastucture.DTO;
+using Infrastucture.DTO.Dto_Users;
 using Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,11 +21,9 @@ namespace Infrastucture.Map
             CreateMap<RegisterDto, AppUsers>().ReverseMap();
             CreateMap<LoginDto, AppUsers>().ReverseMap();
 
-            CreateMap<AddressDto, Address>().ReverseMap();
-            CreateMap<RegisterAddressDto, Address>().ReverseMap();
 
 
-            CreateMap<UserwithaddressDto, AppUsers>()
+            CreateMap<UserwithdetailsDto, AppUsers>()
                 .ForMember(x => x.Address, opt => opt.MapFrom(src => src.AddressDto))
                 .ReverseMap().ForMember(x => x.AddressDto, opt => opt.MapFrom(src => src.Address))
                 .ReverseMap()
@@ -43,9 +41,6 @@ namespace Infrastucture.Map
                 .ReverseMap();
 
 
-
-            CreateMap<VehicleDto,Vehicles>().ReverseMap();
-            CreateMap<RegisterVehicleDto, Vehicles>().ReverseMap();
 
 
         }
