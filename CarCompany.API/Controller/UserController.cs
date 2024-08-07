@@ -394,6 +394,7 @@ namespace CarCompany.API.Controller
                 Phone = registerdto.Phone,
                 birthtime = registerdto.birthtime,
                 AddressId = address.AddressId,
+               
 
             };
 
