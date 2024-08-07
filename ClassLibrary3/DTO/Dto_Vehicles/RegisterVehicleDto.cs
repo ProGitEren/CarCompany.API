@@ -11,9 +11,6 @@ namespace Infrastucture.DTO.Dto_Vehicles
 {
     public class RegisterVehicleDto
     {
-
-
-
         public decimal Averagefuelin { get; set; }
         public decimal Averagefuelout { get; set; }
         public int COemmission { get; set; }

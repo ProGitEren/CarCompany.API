@@ -40,6 +40,11 @@ namespace Infrastucture.Data.Config
             builder.Property(e => e.ModelId).IsRequired();
 
 
+            builder.Property(x => x.ModelId).IsRequired(false);
+            builder.Property(x => x.EngineId).IsRequired(false);
+
+
+
             //Navigational Configurations
 
             // One-To-Many Relationship
