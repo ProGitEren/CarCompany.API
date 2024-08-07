@@ -40,8 +40,8 @@ namespace ClassLibrary2.Entities
         public virtual Address Address { get; set; }
 
 
-        public string? VehicleId { get; set; }
-        public virtual Vehicles Vehicle { get; set; }
+        //public string? VehicleId { get; set; }
+        public virtual ICollection<Vehicles> Vehicles { get; set; }
 
 
     }

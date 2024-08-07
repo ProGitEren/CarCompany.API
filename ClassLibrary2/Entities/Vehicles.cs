@@ -43,6 +43,7 @@ namespace Models.Entities
         // Foreign Keys
         public int? ModelId { get; set; }
         public int? EngineId { get; set; }
+        public string? UserId { get; set; }
 
 
         // Navigation Properties

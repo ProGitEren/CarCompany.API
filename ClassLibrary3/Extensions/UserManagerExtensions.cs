@@ -24,7 +24,7 @@ namespace Infrastucture.Extensions
 
             var appUser = await userManager.Users
             .Include(x => x.Address)
-            .Include(x => x.Vehicle)
+            .Include(x => x.Vehicles)
             .SingleOrDefaultAsync(x => x.Email == email);
 
             return appUser;
@@ -66,7 +66,7 @@ namespace Infrastucture.Extensions
 
             var users = await userManager.Users
                 .Include(x => x.Address)
-                .Include(x => x.Vehicle)
+                .Include(x => x.Vehicles)
                 .ToListAsync();
 
 

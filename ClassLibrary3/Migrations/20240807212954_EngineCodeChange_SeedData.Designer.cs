@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.Designer.cs
-    [Migration("20240806185034_FirstToDesktopDb")]
-    partial class FirstToDesktopDb
-========
-    [Migration("20240807072442_VehicleInfrastructureApplied")]
-    partial class VehicleInfrastructureApplied
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.Designer.cs
+    [Migration("20240807212954_EngineCodeChange_SeedData")]
+    partial class EngineCodeChange_SeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -131,9 +126,6 @@ namespace Infrastucture.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("VehicleId")
-                        .HasColumnType("nchar(17)");
-
                     b.Property<DateTime>("birthtime")
                         .HasColumnType("datetime2");
 
@@ -153,10 +145,6 @@ namespace Infrastucture.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("VehicleId")
-                        .IsUnique()
-                        .HasFilter("[VehicleId] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -307,7 +295,7 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("EngineCode")
                         .IsRequired()
-                        .HasColumnType("nchar(6)");
+                        .HasColumnType("nchar(5)");
 
                     b.Property<int>("Hp")
                         .HasColumnType("int");
@@ -329,12 +317,52 @@ namespace Infrastucture.Migrations
                         new
                         {
                             Id = 1000,
-                            CompressionRatio = 5,
-                            EngineCode = "AB1234",
+                            CompressionRatio = 10,
+                            EngineCode = "EN123",
+                            Hp = 150,
+                            Torque = 200,
+                            Volume = 2.0m,
+                            diameterCm = 8.5m
+                        },
+                        new
+                        {
+                            Id = 1001,
+                            CompressionRatio = 11,
+                            EngineCode = "EN456",
+                            Hp = 250,
+                            Torque = 350,
+                            Volume = 3.5m,
+                            diameterCm = 10.0m
+                        },
+                        new
+                        {
+                            Id = 1002,
+                            CompressionRatio = 12,
+                            EngineCode = "EN789",
+                            Hp = 300,
+                            Torque = 400,
+                            Volume = 4.0m,
+                            diameterCm = 11.0m
+                        },
+                        new
+                        {
+                            Id = 1003,
+                            CompressionRatio = 9,
+                            EngineCode = "EN101",
+                            Hp = 120,
+                            Torque = 180,
+                            Volume = 1.6m,
+                            diameterCm = 7.5m
+                        },
+                        new
+                        {
+                            Id = 1004,
+                            CompressionRatio = 10,
+                            EngineCode = "EN202",
                             Hp = 200,
                             Torque = 250,
-                            Volume = 1000m,
-                            diameterCm = 55m
+                            Volume = 2.5m,
+                            diameterCm = 9.0m
                         });
                 });
 
@@ -352,7 +380,7 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("EngineCode")
                         .IsRequired()
-                        .HasColumnType("nchar(6)");
+                        .HasColumnType("nchar(5)");
 
                     b.Property<int>("ManufacturedCountry")
                         .HasColumnType("int");
@@ -404,17 +432,81 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1000,
                             CheckDigit = "1",
-                            EngineCode = "AB1234",
+                            EngineCode = "EN123",
                             ManufacturedCountry = 1,
                             ManufacturedPlant = "A",
-                            ManufacturedYear = "Y",
-                            Manufacturer = "A",
-                            ModelLongName = "TestLongName",
-                            ModelShortName = "TestShortName",
-                            ModelYear = 2000,
+                            ManufacturedYear = "L",
+                            Manufacturer = "TM",
+                            ModelLongName = "Toyota Camry",
+                            ModelShortName = "Camry",
+                            ModelYear = 2020,
                             Quantity = 0,
                             VehicleType = "Automobile",
                             securityCode = "A"
+                        },
+                        new
+                        {
+                            Id = 1001,
+                            CheckDigit = "2",
+                            EngineCode = "EN456",
+                            ManufacturedCountry = 2,
+                            ManufacturedPlant = "B",
+                            ManufacturedYear = "M",
+                            Manufacturer = "FD",
+                            ModelLongName = "Ford Mustang",
+                            ModelShortName = "Mustang",
+                            ModelYear = 2021,
+                            Quantity = 0,
+                            VehicleType = "Automobile",
+                            securityCode = "B"
+                        },
+                        new
+                        {
+                            Id = 1002,
+                            CheckDigit = "3",
+                            EngineCode = "EN789",
+                            ManufacturedCountry = 1,
+                            ManufacturedPlant = "C",
+                            ManufacturedYear = "K",
+                            Manufacturer = "BM",
+                            ModelLongName = "BMW X5",
+                            ModelShortName = "X5",
+                            ModelYear = 2019,
+                            Quantity = 0,
+                            VehicleType = "SUV",
+                            securityCode = "C"
+                        },
+                        new
+                        {
+                            Id = 1003,
+                            CheckDigit = "4",
+                            EngineCode = "EN101",
+                            ManufacturedCountry = 1,
+                            ManufacturedPlant = "D",
+                            ManufacturedYear = "J",
+                            Manufacturer = "HN",
+                            ModelLongName = "Honda Civic",
+                            ModelShortName = "Civic",
+                            ModelYear = 2018,
+                            Quantity = 0,
+                            VehicleType = "Automobile",
+                            securityCode = "D"
+                        },
+                        new
+                        {
+                            Id = 1004,
+                            CheckDigit = "5",
+                            EngineCode = "EN202",
+                            ManufacturedCountry = 1,
+                            ManufacturedPlant = "E",
+                            ManufacturedYear = "H",
+                            Manufacturer = "NS",
+                            ModelLongName = "Nissan Altima",
+                            ModelShortName = "Altima",
+                            ModelYear = 2017,
+                            Quantity = 0,
+                            VehicleType = "Automobile",
+                            securityCode = "E"
                         });
                 });
 
@@ -439,7 +531,6 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("EngineId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int>("FuelCapacity")
@@ -452,14 +543,18 @@ namespace Infrastucture.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("ModelId")
-                        .IsRequired()
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Vin");
 
                     b.HasIndex("EngineId");
 
                     b.HasIndex("ModelId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Vehicles");
                 });
@@ -471,14 +566,7 @@ namespace Infrastucture.Migrations
                         .HasForeignKey("ClassLibrary2.Entities.AppUsers", "AddressId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Models.Entities.Vehicles", "Vehicle")
-                        .WithOne("User")
-                        .HasForeignKey("ClassLibrary2.Entities.AppUsers", "VehicleId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Address");
-
-                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -537,16 +625,21 @@ namespace Infrastucture.Migrations
                     b.HasOne("Models.Entities.Engines", "Engine")
                         .WithMany("Vehicles")
                         .HasForeignKey("EngineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Models.Entities.VehicleModels", "VehicleModel")
                         .WithMany("Vehicles")
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ClassLibrary2.Entities.AppUsers", "User")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Engine");
+
+                    b.Navigation("User");
 
                     b.Navigation("VehicleModel");
                 });
@@ -557,6 +650,11 @@ namespace Infrastucture.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ClassLibrary2.Entities.AppUsers", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
             modelBuilder.Entity("Models.Entities.Engines", b =>
                 {
                     b.Navigation("Vehicles");
@@ -565,12 +663,6 @@ namespace Infrastucture.Migrations
             modelBuilder.Entity("Models.Entities.VehicleModels", b =>
                 {
                     b.Navigation("Vehicles");
-                });
-
-            modelBuilder.Entity("Models.Entities.Vehicles", b =>
-                {
-                    b.Navigation("User")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

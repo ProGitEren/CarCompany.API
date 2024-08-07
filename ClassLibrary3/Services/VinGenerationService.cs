@@ -47,19 +47,19 @@ namespace Infrastucture.Services
             vinBuilder.Append(vehicleModel.ManufacturedYear);
             vinBuilder.Append(vehicleModel.ManufacturedPlant);
 
-            var first12Characters = vinBuilder.ToString();
+            var first11Characters = vinBuilder.ToString();
 
             // Get the current max VIN suffix
             var currentMaxSuffix = _unitOfWork.VehicleRepository
                 .GetAll()
-                .Where(v => v.Vin.StartsWith(first12Characters))
-                .Max(v => (int?)int.Parse(v.Vin.Substring(12))) ?? 0;
+                .Where(v => v.Vin.StartsWith(first11Characters))
+                .Max(v => (int?)int.Parse(v.Vin.Substring(11))) ?? 0;
 
             // Increment the suffix to get the new VIN
-            var vinSuffix = (currentMaxSuffix + 1).ToString("D5");
+            var vinSuffix = (currentMaxSuffix + 1).ToString("D6");
 
             // Combine the first 12 characters with the new suffix
-            return first12Characters + vinSuffix;
+            return first11Characters + vinSuffix;
         }
 
     }

@@ -42,6 +42,7 @@ namespace Infrastucture.Data.Config
 
             builder.Property(x => x.ModelId).IsRequired(false);
             builder.Property(x => x.EngineId).IsRequired(false);
+            builder.Property(x => x.UserId).IsRequired(false);
 
 
 
@@ -59,11 +60,11 @@ namespace Infrastucture.Data.Config
                 .HasForeignKey(e => e.EngineId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //One-To-One Relationship
+            //One-To-Many Relationship
             builder.HasOne(e => e.User)
-                .WithOne(x => x.Vehicle)
-                .HasForeignKey<AppUsers>(x => x.VehicleId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .WithMany(x => x.Vehicles)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.SetNull); // Set Null so that anothe ruser will be related to this vehicle after the vehicle is sold
 
 
             // Did not seed data as the properties will depend on the Model and Engine inside it therefore seeding will not be done through here as 

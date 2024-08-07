@@ -35,7 +35,7 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.ManufacturedPlant).IsRequired().HasColumnType("nchar(1)");
             builder.Property(x => x.ManufacturedYear).IsRequired().HasColumnType("nchar(1)");
             builder.Property(x => x.CheckDigit).IsRequired().HasColumnType("nchar(1)");
-            builder.Property(x => x.EngineCode).IsRequired().HasColumnType("nchar(6)");
+            builder.Property(x => x.EngineCode).IsRequired().HasColumnType("nchar(5)");
             builder.Property(x => x.ModelLongName).HasMaxLength(100);
             builder.Property(x => x.ModelShortName).HasMaxLength(20);
 
@@ -53,27 +53,86 @@ namespace Infrastucture.Data.Config
 
             // Seed Data
 
+            // Seed Data
             builder.HasData(
                 new VehicleModels
-
                 {
                     Id = 1000,
                     CheckDigit = "1",
-                    ModelYear = 2000,
+                    ModelYear = 2020,
                     ManufacturedCountry = 1,
                     ManufacturedPlant = "A",
-                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2000).ToString(),
-                    EngineCode = "AB1234",
+                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2020).ToString(),
+                    EngineCode = "EN123",
                     securityCode = "A",
-                    Manufacturer = "A",
-                    ModelLongName = "TestLongName",
-                    ModelShortName = "TestShortName",
+                    Manufacturer = "TM",
+                    ModelLongName = "Toyota Camry",
+                    ModelShortName = "Camry",
                     VehicleType = VehicleType.Automobile
+                },
+                new VehicleModels
+                {
+                    Id = 1001,
+                    CheckDigit = "2",
+                    ModelYear = 2021,
+                    ManufacturedCountry = 2,
+                    ManufacturedPlant = "B",
+                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2021).ToString(),
+                    EngineCode = "EN456",
+                    securityCode = "B",
+                    Manufacturer = "FD",
+                    ModelLongName = "Ford Mustang",
+                    ModelShortName = "Mustang",
+                    VehicleType = VehicleType.Automobile
+                },
+                new VehicleModels
+                {
+                    Id = 1002,
+                    CheckDigit = "3",
+                    ModelYear = 2019,
+                    ManufacturedCountry = 1,
+                    ManufacturedPlant = "C",
+                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2019).ToString(),
+                    EngineCode = "EN789",
+                    securityCode = "C",
+                    Manufacturer = "BM",
+                    ModelLongName = "BMW X5",
+                    ModelShortName = "X5",
+                    VehicleType = VehicleType.SUV
+                },
+                new VehicleModels
+                {
+                    Id = 1003,
+                    CheckDigit = "4",
+                    ModelYear = 2018,
+                    ManufacturedCountry = 1,
+                    ManufacturedPlant = "D",
+                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2018).ToString(),
+                    EngineCode = "EN101",
+                    securityCode = "D",
+                    Manufacturer = "HN",
+                    ModelLongName = "Honda Civic",
+                    ModelShortName = "Civic",
+                    VehicleType = VehicleType.Automobile
+                },
+                new VehicleModels
+                {
+                    Id = 1004,
+                    CheckDigit = "5",
+                    ModelYear = 2017,
+                    ManufacturedCountry = 1,
+                    ManufacturedPlant = "E",
+                    ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2017).ToString(),
+                    EngineCode = "EN202",
+                    securityCode = "E",
+                    Manufacturer = "NS",
+                    ModelLongName = "Nissan Altima",
+                    ModelShortName = "Altima",
+                    VehicleType = VehicleType.Automobile
+                }
+            );
 
 
-                });
-
-           
         }
 
     }

@@ -27,8 +27,8 @@ namespace Infrastucture.Map
                 .ForMember(x => x.Address, opt => opt.MapFrom(src => src.AddressDto))
                 .ReverseMap().ForMember(x => x.AddressDto, opt => opt.MapFrom(src => src.Address))
                 .ReverseMap()
-                .ForMember(x => x.Vehicle, opt => opt.MapFrom(src => src.VehicleDto))
-                .ReverseMap().ForMember(x => x.VehicleDto, opt => opt.MapFrom(src => src.Vehicle))
+                .ForMember(x => x.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto))
+                .ReverseMap().ForMember(x => x.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles))
                 .ReverseMap();
 
 
@@ -36,8 +36,8 @@ namespace Infrastucture.Map
                 .ForMember(x => x.Address, opt => opt.MapFrom(src => src.AddressDto))
                 .ReverseMap().ForMember(x => x.AddressDto, opt => opt.MapFrom(src => src.Address))
                 .ReverseMap()
-                .ForMember(x => x.Vehicle, opt => opt.MapFrom(src => src.VehicleDto))
-                .ReverseMap().ForMember(x => x.VehicleDto, opt => opt.MapFrom(src => src.Vehicle))
+                .ForMember(x => x.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto))
+                .ReverseMap().ForMember(x => x.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles))
                 .ReverseMap();
 
 

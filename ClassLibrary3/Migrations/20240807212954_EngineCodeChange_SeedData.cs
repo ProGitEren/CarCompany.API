@@ -3,14 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Infrastucture.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.cs
-    public partial class FirstToDesktopDb : Migration
-========
-    public partial class VehicleInfrastructureApplied : Migration
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.cs
+    public partial class EngineCodeChange_SeedData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,20 +49,12 @@ namespace Infrastucture.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.cs
                     Volume = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     Hp = table.Column<int>(type: "int", nullable: false),
                     CompressionRatio = table.Column<int>(type: "int", nullable: false),
                     Torque = table.Column<int>(type: "int", nullable: false),
-                    diameterCm = table.Column<decimal>(type: "decimal(18,4)", nullable: false)
-========
-                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Hp = table.Column<int>(type: "int", nullable: false),
-                    CompressionRatio = table.Column<int>(type: "int", nullable: false),
-                    Torque = table.Column<int>(type: "int", nullable: false),
-                    diameterCm = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EngineCode = table.Column<string>(type: "nchar(6)", nullable: false)
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.cs
+                    diameterCm = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    EngineCode = table.Column<string>(type: "nchar(5)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,91 +68,21 @@ namespace Infrastucture.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.cs
-                    ModelCode = table.Column<string>(type: "nchar(6)", fixedLength: true, maxLength: 6, nullable: false),
-========
-                    EngineCode = table.Column<string>(type: "nchar(6)", nullable: false),
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.cs
+                    EngineCode = table.Column<string>(type: "nchar(5)", nullable: false),
                     ModelShortName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     ModelLongName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     ModelYear = table.Column<int>(type: "int", nullable: false),
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.cs
-                    ManufacturedCountry = table.Column<int>(type: "int", maxLength: 1, nullable: false),
-                    Manufacturer = table.Column<string>(type: "nchar(2)", fixedLength: true, maxLength: 2, nullable: false),
-                    securityCode = table.Column<string>(type: "nchar(1)", fixedLength: true, maxLength: 1, nullable: false),
-                    ManufacturedYear = table.Column<string>(type: "nchar(1)", fixedLength: true, maxLength: 1, nullable: false),
-                    ManufacturedPlant = table.Column<string>(type: "nchar(1)", fixedLength: true, maxLength: 1, nullable: false),
-                    CheckDigit = table.Column<string>(type: "nchar(1)", fixedLength: true, maxLength: 1, nullable: false)
-========
                     ManufacturedCountry = table.Column<int>(type: "int", nullable: false),
                     Manufacturer = table.Column<string>(type: "nchar(2)", nullable: false),
                     securityCode = table.Column<string>(type: "nchar(1)", nullable: false),
                     ManufacturedYear = table.Column<string>(type: "nchar(1)", nullable: false),
                     ManufacturedPlant = table.Column<string>(type: "nchar(1)", nullable: false),
                     CheckDigit = table.Column<string>(type: "nchar(1)", nullable: false)
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.cs
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VehicleModels", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vehicles",
-                columns: table => new
-                {
-<<<<<<<< HEAD:ClassLibrary3/Migrations/20240806185034_FirstToDesktopDb.cs
-                    Vin = table.Column<string>(type: "nchar(17)", fixedLength: true, maxLength: 17, nullable: false),
-========
-                    Vin = table.Column<string>(type: "nchar(17)", nullable: false),
->>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86:ClassLibrary3/Migrations/20240807072442_VehicleInfrastructureApplied.cs
-                    Averagefuelin = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    Averagefuelout = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    COemmission = table.Column<int>(type: "int", nullable: false),
-                    FuelCapacity = table.Column<int>(type: "int", nullable: false),
-                    MaxAllowedWeight = table.Column<int>(type: "int", nullable: false),
-                    MinWeight = table.Column<int>(type: "int", nullable: false),
-                    BaggageVolume = table.Column<int>(type: "int", nullable: false),
-                    DrivenKM = table.Column<int>(type: "int", nullable: false),
-                    ModelId = table.Column<int>(type: "int", nullable: false),
-                    EngineId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vehicles", x => x.Vin);
-                    table.ForeignKey(
-                        name: "FK_Vehicles_Engines_EngineId",
-                        column: x => x.EngineId,
-                        principalTable: "Engines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Vehicles_VehicleModels_ModelId",
-                        column: x => x.ModelId,
-                        principalTable: "VehicleModels",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -176,7 +96,6 @@ namespace Infrastucture.Migrations
                     birthtime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     roles = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    VehicleId = table.Column<string>(type: "nchar(17)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -201,11 +120,27 @@ namespace Infrastucture.Migrations
                         principalTable: "Addresses",
                         principalColumn: "AddressId",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Vehicles_VehicleId",
-                        column: x => x.VehicleId,
-                        principalTable: "Vehicles",
-                        principalColumn: "Vin");
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,15 +228,68 @@ namespace Infrastucture.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    Vin = table.Column<string>(type: "nchar(17)", nullable: false),
+                    Averagefuelin = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    Averagefuelout = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
+                    COemmission = table.Column<int>(type: "int", nullable: false),
+                    FuelCapacity = table.Column<int>(type: "int", nullable: false),
+                    MaxAllowedWeight = table.Column<int>(type: "int", nullable: false),
+                    MinWeight = table.Column<int>(type: "int", nullable: false),
+                    BaggageVolume = table.Column<int>(type: "int", nullable: false),
+                    DrivenKM = table.Column<int>(type: "int", nullable: false),
+                    ModelId = table.Column<int>(type: "int", nullable: true),
+                    EngineId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.Vin);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_Engines_EngineId",
+                        column: x => x.EngineId,
+                        principalTable: "Engines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_VehicleModels_ModelId",
+                        column: x => x.ModelId,
+                        principalTable: "VehicleModels",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "Engines",
                 columns: new[] { "Id", "CompressionRatio", "EngineCode", "Hp", "Torque", "Volume", "diameterCm" },
-                values: new object[] { 1000, 5, "AB1234", 200, 250, 1000m, 55m });
+                values: new object[,]
+                {
+                    { 1000, 10, "EN123", 150, 200, 2.0m, 8.5m },
+                    { 1001, 11, "EN456", 250, 350, 3.5m, 10.0m },
+                    { 1002, 12, "EN789", 300, 400, 4.0m, 11.0m },
+                    { 1003, 9, "EN101", 120, 180, 1.6m, 7.5m },
+                    { 1004, 10, "EN202", 200, 250, 2.5m, 9.0m }
+                });
 
             migrationBuilder.InsertData(
                 table: "VehicleModels",
                 columns: new[] { "Id", "CheckDigit", "EngineCode", "ManufacturedCountry", "ManufacturedPlant", "ManufacturedYear", "Manufacturer", "ModelLongName", "ModelShortName", "ModelYear", "VehicleType", "securityCode" },
-                values: new object[] { 1000, "1", "AB1234", 1, "A", "Y", "A", "TestLongName", "TestShortName", 2000, "Automobile", "A" });
+                values: new object[,]
+                {
+                    { 1000, "1", "EN123", 1, "A", "L", "TM", "Toyota Camry", "Camry", 2020, "Automobile", "A" },
+                    { 1001, "2", "EN456", 2, "B", "M", "FD", "Ford Mustang", "Mustang", 2021, "Automobile", "B" },
+                    { 1002, "3", "EN789", 1, "C", "K", "BM", "BMW X5", "X5", 2019, "SUV", "C" },
+                    { 1003, "4", "EN101", 1, "D", "J", "HN", "Honda Civic", "Civic", 2018, "Automobile", "D" },
+                    { 1004, "5", "EN202", 1, "E", "H", "NS", "Nissan Altima", "Altima", 2017, "Automobile", "E" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -343,13 +331,6 @@ namespace Infrastucture.Migrations
                 filter: "[AddressId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_VehicleId",
-                table: "AspNetUsers",
-                column: "VehicleId",
-                unique: true,
-                filter: "[VehicleId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -365,6 +346,11 @@ namespace Infrastucture.Migrations
                 name: "IX_Vehicles_ModelId",
                 table: "Vehicles",
                 column: "ModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_UserId",
+                table: "Vehicles",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -386,22 +372,22 @@ namespace Infrastucture.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Vehicles");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Addresses");
-
-            migrationBuilder.DropTable(
-                name: "Vehicles");
-
-            migrationBuilder.DropTable(
                 name: "Engines");
 
             migrationBuilder.DropTable(
                 name: "VehicleModels");
+
+            migrationBuilder.DropTable(
+                name: "Addresses");
         }
     }
 }

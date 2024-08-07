@@ -28,7 +28,7 @@ namespace Infrastucture.Data.Config
             builder.Ignore(x => x.roles);
             builder.Property(x => x.roles).IsRequired(false);
 
-            builder.Property(x => x.VehicleId).IsRequired(false);
+            //builder.Property(x => x.VehicleId).IsRequired(false);
             builder.Property(x => x.AddressId).IsRequired(false);
 
 
@@ -42,10 +42,10 @@ namespace Infrastucture.Data.Config
            .OnDelete(DeleteBehavior.SetNull); // Disable cascade delete
 
            builder
-          .HasOne(u => u.Vehicle)
+          .HasMany(u => u.Vehicles)
           .WithOne(e => e.User) // Assuming Address does not have a navigation property to AppUsers
-          .HasForeignKey<AppUsers>(u => u.VehicleId)
-          .OnDelete(DeleteBehavior.SetNull); // Disable cascade delete
+          .HasForeignKey(u => u.UserId)
+          .OnDelete(DeleteBehavior.NoAction); // Disable cascade delete
 
             // This is important as a user can have a vehicle or not 
 

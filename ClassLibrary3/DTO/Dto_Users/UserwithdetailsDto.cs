@@ -20,7 +20,7 @@ namespace Infrastucture.DTO.Dto_Users
 
         public AddressDto AddressDto { get; set; }
 
-        public VehicleDto VehicleDto { get; set; }
+        public ICollection<VehicleDto> VehiclesDto { get; set; }
 
         public string Token { get; set; }
 

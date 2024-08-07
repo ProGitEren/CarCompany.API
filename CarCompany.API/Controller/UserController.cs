@@ -809,7 +809,7 @@ namespace CarCompany.API.Controller
                 });
             }
 
-            var user = await _usermanager.Users.Where(x => x.Email == email).Include(y => y.Address).Include(x=> x.Vehicle).FirstOrDefaultAsync();
+            var user = await _usermanager.Users.Where(x => x.Email == email).Include(y => y.Address).Include(x=> x.Vehicles).FirstOrDefaultAsync();
             user = await _usermanager.AddRolestoUserAsync(user);
 
             if (user != null)
@@ -934,7 +934,7 @@ namespace CarCompany.API.Controller
             }
 
             var addressId = user.AddressId;
-            var vehicleId = user.VehicleId;
+            //var vehicleId = user.VehicleId;
             var result = await _usermanager.DeleteAsync(user);
 
             if (result.Succeeded)
@@ -942,7 +942,7 @@ namespace CarCompany.API.Controller
                 try
                 {
                     await _uow.AddressRepository.DeleteAsync(addressId);
-                    await _uow.VehicleRepository.DeleteAsync(vehicleId);
+                    //await _uow.VehicleRepository.DeleteAsync(vehicleId);
                     _logger.Information("User,vehicle and address deleted successfully, CorrelationId: {CorrelationId}", correlationId);
                     return Ok("The user and the address successfully deleted.");
                 }
