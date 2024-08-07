@@ -1,5 +1,5 @@
 ﻿using ClassLibrary2.Entities;
-using Infrastucture.Interface;
+using Infrastucture.Interface.Service_Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.Repository
+namespace Infrastucture.Services
 {
     public class TokenServices : ITokenServices
     {
@@ -26,14 +26,14 @@ namespace Infrastucture.Repository
             _usermanager = usermanager;
         }
 
-        public async Task<string> CreateToken(AppUsers appUsers) 
+        public async Task<string> CreateToken(AppUsers appUsers)
         {
-            var creds = new SigningCredentials(_key,SecurityAlgorithms.HmacSha256Signature);
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature);
             var Claims = new List<Claim>()
             {
                 new Claim(JwtRegisteredClaimNames.Email, appUsers.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, appUsers.Email),
-              
+
 
             };
 

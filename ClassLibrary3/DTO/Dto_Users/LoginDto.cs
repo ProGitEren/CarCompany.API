@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.DTO
+namespace Infrastucture.DTO.Dto_Users
 {
     public class LoginDto
     {
-        [Required]
+
         public string Email { get; set; }
 
-        [Required]
         public string EncryptedPassword { get; set; }
     }
 }

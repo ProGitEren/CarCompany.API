@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models.Mapping
 {
-    public class VinYearMapper
+    public static class VinYearMapper
     {
         private static readonly Dictionary<int, char> YearMapping = new Dictionary<int, char>
     {

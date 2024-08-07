@@ -46,7 +46,7 @@ namespace Models.Entities
         [Range(0, 200, ErrorMessage = " The Diameter (Bore) of the Engine should not exceed 200 mm .")]
         public decimal diameterCm { get; set; }
 
-        
+        public string EngineCode { get; set; }
         
         //Navigational Property
 

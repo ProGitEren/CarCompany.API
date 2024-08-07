@@ -5,13 +5,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.Interface
+namespace Infrastucture.Interface.Service_Interfaces
 {
     public interface IEncryptionService
     {
-       string Encrypt(string plainText);   
-        
-       string Decrypt(string cipherText);
-        
+        string Encrypt(string plainText);
+
+        string Decrypt(string cipherText);
+
     }
 }

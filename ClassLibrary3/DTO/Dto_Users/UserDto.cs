@@ -1,27 +1,24 @@
-﻿using System;
+﻿using ClassLibrary2.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.DTO
+namespace Infrastucture.DTO.Dto_Users
 {
-    public class UpdateUserDto
+    public class UserDto
     {
-        [Required]
 
         public string FirstName { get; set; }
 
-        [Required]
-        [EmailAddress]
         public string Email { get; set; }
-
-        [Required]
 
         public string LastName { get; set; }
 
-     
+        public string Token { get; set; }
+
 
     }
 }

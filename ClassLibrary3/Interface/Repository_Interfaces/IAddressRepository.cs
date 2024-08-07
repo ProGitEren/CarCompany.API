@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.Interface
+namespace Infrastucture.Interface.Repository_Interfaces
 {
-    public interface IAddressRepository : IGenericRepository<Address>
+    public interface IAddressRepository : IGenericRepository<Address, Guid?>
     {
 
     }

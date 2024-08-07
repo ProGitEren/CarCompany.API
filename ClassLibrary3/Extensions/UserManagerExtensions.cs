@@ -17,7 +17,7 @@ namespace Infrastucture.Extensions
     public static class UserManagerExtensions
     {
 
-        public static async Task<AppUsers> FindEmailByClaimIncluded(this UserManager<AppUsers> userManager, ClaimsPrincipal user)
+        public static async Task<AppUsers> FindEmailByClaimWithDetailAsync(this UserManager<AppUsers> userManager, ClaimsPrincipal user)
         {
             var email = user?.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
@@ -53,7 +53,7 @@ namespace Infrastucture.Extensions
 
         }
 
-        public static async Task<IReadOnlyList<AppUsers?>> GetAllUsers(this UserManager<AppUsers> userManager)
+        public static async Task<IReadOnlyList<AppUsers?>> GetAllUsersAsync(this UserManager<AppUsers> userManager)
         {
             var users = await userManager.Users.ToListAsync() as IReadOnlyList<AppUsers>;
 
@@ -61,7 +61,7 @@ namespace Infrastucture.Extensions
 
         }
 
-        public static async Task<IList<AppUsers?>> GetAllUsersIncluded(this UserManager<AppUsers> userManager)
+        public static async Task<IList<AppUsers?>> GetAllUsersWithDetailsAsync(this UserManager<AppUsers> userManager)
         {
 
             var users = await userManager.Users
@@ -86,6 +86,28 @@ namespace Infrastucture.Extensions
             }
 
             return listusers as IReadOnlyList<AppUsers> ;
+        }
+
+        public static async Task<bool> IsPasswordUniqueAsync(this UserManager<AppUsers> userManager, string password, Serilog.ILogger logger, IPasswordHasher<AppUsers> passwordhasher, string? correlationId)
+        {
+            
+            logger.Information("Checking if password is unique, CorrelationId: {CorrelationId}", correlationId);
+
+
+            var users = await userManager.Users.ToListAsync();
+
+            foreach (var user in users)
+            {
+                var verificationResult = passwordhasher.VerifyHashedPassword(user, user.PasswordHash, password);
+                if (verificationResult == PasswordVerificationResult.Success)
+                {
+                    logger.Warning("Password is not unique, CorrelationId: {CorrelationId}", correlationId);
+                    return false; // Password is not unique
+                }
+            }
+
+            logger.Information("Password is unique, CorrelationId: {CorrelationId}", correlationId);
+            return true;
         }
 
     }

@@ -20,8 +20,7 @@ namespace Infrastucture.Data.Config
 
             builder.Property(e => e.Vin)
                 .IsRequired()
-                .HasMaxLength(17)
-                .IsFixedLength();
+                .HasColumnType("nchar(17)");
 
 
             // Instance Requirements 
@@ -36,7 +35,7 @@ namespace Infrastucture.Data.Config
             builder.Property(e => e.MaxAllowedWeight).IsRequired();
             builder.Property(e => e.FuelCapacity).IsRequired();
             builder.Property(e => e.DrivenKM).IsRequired();
-
+                    
             builder.Property(e => e.EngineId).IsRequired();
             builder.Property(e => e.ModelId).IsRequired();
 

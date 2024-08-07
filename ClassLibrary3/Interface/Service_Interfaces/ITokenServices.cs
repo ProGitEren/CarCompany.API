@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastucture.Interface
+namespace Infrastucture.Interface.Service_Interfaces
 {
     public interface ITokenServices
     {

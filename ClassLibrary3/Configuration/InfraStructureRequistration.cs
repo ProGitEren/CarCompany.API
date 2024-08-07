@@ -1,9 +1,10 @@
 ﻿using ClassLibrary2.Entities;
 using Infrastucture.Data;
 using Infrastucture.Data.Config;
-using Infrastucture.Interface;
+using Infrastucture.Interface.Repository_Interfaces;
+using Infrastucture.Interface.Service_Interfaces;
 using Infrastucture.Repository;
-
+using Infrastucture.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -26,9 +27,13 @@ namespace Infrastucture.Configuration
 
         public static IServiceCollection InfraStructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+
+            services.AddScoped<IVinGenerationService, VinGenerationService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<ITokenServices, TokenServices>();
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
@@ -62,12 +67,10 @@ namespace Infrastucture.Configuration
                     //.AddPasswordValidator<UsersPasswordValidation>()
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
-                    
+
 
 
             services.AddMemoryCache();
-
-            services.AddScoped<ITokenServices, TokenServices>();
 
             services.AddAuthentication(opt =>
             {

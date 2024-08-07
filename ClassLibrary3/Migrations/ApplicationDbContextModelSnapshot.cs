@@ -297,6 +297,10 @@ namespace Infrastucture.Migrations
                     b.Property<int>("CompressionRatio")
                         .HasColumnType("int");
 
+                    b.Property<string>("EngineCode")
+                        .IsRequired()
+                        .HasColumnType("nchar(6)");
+
                     b.Property<int>("Hp")
                         .HasColumnType("int");
 
@@ -312,6 +316,18 @@ namespace Infrastucture.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Engines");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1000,
+                            CompressionRatio = 5,
+                            EngineCode = "AB1234",
+                            Hp = 200,
+                            Torque = 250,
+                            Volume = 1000m,
+                            diameterCm = 55m
+                        });
                 });
 
             modelBuilder.Entity("Models.Entities.VehicleModels", b =>
@@ -324,37 +340,26 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("CheckDigit")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nchar(1)")
-                        .IsFixedLength();
+                        .HasColumnType("nchar(1)");
+
+                    b.Property<string>("EngineCode")
+                        .IsRequired()
+                        .HasColumnType("nchar(6)");
 
                     b.Property<int>("ManufacturedCountry")
-                        .HasMaxLength(1)
                         .HasColumnType("int");
 
                     b.Property<string>("ManufacturedPlant")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nchar(1)")
-                        .IsFixedLength();
+                        .HasColumnType("nchar(1)");
 
                     b.Property<string>("ManufacturedYear")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nchar(1)")
-                        .IsFixedLength();
+                        .HasColumnType("nchar(1)");
 
                     b.Property<string>("Manufacturer")
                         .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nchar(2)")
-                        .IsFixedLength();
-
-                    b.Property<string>("ModelCode")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nchar(6)")
-                        .IsFixedLength();
+                        .HasColumnType("nchar(2)");
 
                     b.Property<string>("ModelLongName")
                         .IsRequired()
@@ -380,21 +385,41 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("securityCode")
                         .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nchar(1)")
-                        .IsFixedLength();
+                        .HasColumnType("nchar(1)");
 
                     b.HasKey("Id");
 
                     b.ToTable("VehicleModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1000,
+                            CheckDigit = "1",
+                            EngineCode = "AB1234",
+                            ManufacturedCountry = 1,
+                            ManufacturedPlant = "A",
+                            ManufacturedYear = "Y",
+                            Manufacturer = "A",
+                            ModelLongName = "TestLongName",
+                            ModelShortName = "TestShortName",
+                            ModelYear = 2000,
+                            Quantity = 0,
+                            VehicleType = "Automobile",
+                            securityCode = "A"
+                        });
                 });
 
             modelBuilder.Entity("Models.Entities.Vehicles", b =>
                 {
                     b.Property<string>("Vin")
+<<<<<<< HEAD
                         .HasMaxLength(17)
                         .HasColumnType("nchar(17)")
                         .IsFixedLength();
+=======
+                        .HasColumnType("nchar(17)");
+>>>>>>> 803cb7ed0cbf2d3b62615e018a872a4e83debf86
 
                     b.Property<decimal>("Averagefuelin")
                         .HasColumnType("decimal(18, 4)");

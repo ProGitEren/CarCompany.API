@@ -4,38 +4,29 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Infrastucture.DTO.Dto_Address;
+using Infrastucture.DTO.Dto_Vehicles;
 
-namespace Infrastucture.DTO
+namespace Infrastucture.DTO.Dto_Users
 {
     public class UsernotokenDto
     {
-        [Required]
+
         public string FirstName { get; set; }
 
-        [Required]
-        [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         public string LastName { get; set; }
-        
-        [Required]
 
         public AddressDto AddressDto { get; set; }
 
-        [Required]
-
         public VehicleDto VehicleDto { get; set; }
-
-        [Required]
 
         public string Phone { get; set; }
 
-        [Required]
-        
         public IList<string> roles { get; set; }
 
-       
+
 
     }
 }

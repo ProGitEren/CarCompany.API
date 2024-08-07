@@ -1,4 +1,4 @@
-﻿using Infrastucture.Interface;
+﻿using Infrastucture.Interface.Service_Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;

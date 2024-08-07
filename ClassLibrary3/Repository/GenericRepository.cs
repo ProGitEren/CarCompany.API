@@ -1,5 +1,6 @@
-﻿using Infrastucture.Data;
-using Infrastucture.Interface;
+﻿using ClassLibrary2.Entities;
+using Infrastucture.Data;
+using Infrastucture.Interface.Repository_Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.Repository
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository< T , K > : IGenericRepository< T , K > where T : class
     {
 
         private readonly ApplicationDbContext _context;
@@ -25,12 +26,7 @@ namespace Infrastucture.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid? Id)
-        {
-            var entity = await _context.Set<T>().FindAsync(Id);
-            _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
-        }
+       
 
         public IEnumerable<T> GetAll()
 
@@ -46,13 +42,23 @@ namespace Infrastucture.Repository
             }
         }
 
-        public async Task<T> GetByIdAsync(Guid? Id)
+
+        public async Task DeleteAsync(K Id)
+        {
+            var entity = await _context.Set<T>().FindAsync(Id);
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+            
+        public async Task<T> GetByIdAsync(K Id)
         {
 
-                var obj = await _context.FindAsync<T>(Id);
-                return obj;
-            
+            var obj = await _context.FindAsync<T>(Id);
+            return obj;
+
         }
+
+
 
     }
 }
