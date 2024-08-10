@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace Models.Entities
     {
         
         public string Vin { get; set; }
+
+        public string UserName { get; set; }
 
         public decimal Averagefuelin { get; set; }
 
@@ -36,13 +39,18 @@ namespace Models.Entities
 
         public int DrivenKM { get; set; }
 
+        [AllowNull]
+        [NotMapped]
+
+        public string ModelCode { get; set; }
+
 
 
         // Navigatipnal Property
 
         // Foreign Keys
-        public int? ModelId { get; set; }
-        public int? EngineId { get; set; }
+        public int ModelId { get; set; }
+        public int EngineId { get; set; }
         public string? UserId { get; set; }
 
 

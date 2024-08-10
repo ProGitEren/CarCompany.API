@@ -11,13 +11,14 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.Repository
 {
-    public class VehicleRepository :  GenericRepository<Vehicles,string?> , IVehicleRepository 
+    public class VehicleRepository :  GenericRepository<Vehicles,string?> , IVehicleRepository  
     {
-     
+        
         public VehicleRepository(ApplicationDbContext context) : base(context)
         {
             
         }
+
 
     }
 }

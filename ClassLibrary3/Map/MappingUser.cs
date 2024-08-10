@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
+using Infrastucture.DTO.Dto_Address;
 using Infrastucture.DTO.Dto_Users;
+using Infrastucture.DTO.Dto_Vehicles;
 using Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ namespace Infrastucture.Map
 {
     public class MappingUser : Profile
     {
-        
+
         public MappingUser()
         {
             CreateMap<UserDto, AppUsers>().ReverseMap();
@@ -22,27 +24,83 @@ namespace Infrastucture.Map
             CreateMap<LoginDto, AppUsers>().ReverseMap();
 
 
-
+            // Mapping UserwithdetailsDto to AppUsers and vice versa
             CreateMap<UserwithdetailsDto, AppUsers>()
-                .ForMember(x => x.Address, opt => opt.MapFrom(src => src.AddressDto))
-                .ReverseMap().ForMember(x => x.AddressDto, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.AddressDto))
+                .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto.Select(vehicleDto => new Vehicles
+                {
+                    Vin = vehicleDto.Vin,
+                    Averagefuelin = vehicleDto.Averagefuelin,
+                    Averagefuelout = vehicleDto.Averagefuelout,
+                    COemmission = vehicleDto.COemmission,
+                    FuelCapacity = vehicleDto.FuelCapacity,
+                    MaxAllowedWeight = vehicleDto.MaxAllowedWeight,
+                    MinWeight = vehicleDto.MinWeight,
+                    BaggageVolume = vehicleDto.BaggageVolume,
+                    DrivenKM = vehicleDto.DrivenKM,
+                    ModelId = vehicleDto.ModelId,
+                    EngineId = vehicleDto.EngineId,
+                    UserId = vehicleDto.UserId,
+                }).ToList()))
                 .ReverseMap()
-                .ForMember(x => x.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto))
-                .ReverseMap().ForMember(x => x.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles))
-                .ReverseMap();
+                .ForMember(dest => dest.AddressDto, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles.Select(vehicle => new VehicleDto
+                {
+                    Vin = vehicle.Vin,
+                    Averagefuelin = vehicle.Averagefuelin,
+                    Averagefuelout = vehicle.Averagefuelout,
+                    COemmission = vehicle.COemmission,
+                    FuelCapacity = vehicle.FuelCapacity,
+                    MaxAllowedWeight = vehicle.MaxAllowedWeight,
+                    MinWeight = vehicle.MinWeight,
+                    BaggageVolume = vehicle.BaggageVolume,
+                    DrivenKM = vehicle.DrivenKM,
+                    ModelId = vehicle.ModelId,
+                    EngineId = vehicle.EngineId,
+                    UserId = vehicle.UserId
+
+                }).ToList()));
+
+
 
 
             CreateMap<UsernotokenDto, AppUsers>()
-                .ForMember(x => x.Address, opt => opt.MapFrom(src => src.AddressDto))
-                .ReverseMap().ForMember(x => x.AddressDto, opt => opt.MapFrom(src => src.Address))
-                .ReverseMap()
-                .ForMember(x => x.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto))
-                .ReverseMap().ForMember(x => x.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles))
-                .ReverseMap();
-
-
+                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.AddressDto))
+                 .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.VehiclesDto.Select(vehicleDto => new Vehicles
+                 {
+                     Vin = vehicleDto.Vin,
+                     Averagefuelin = vehicleDto.Averagefuelin,
+                     Averagefuelout = vehicleDto.Averagefuelout,
+                     COemmission = vehicleDto.COemmission,
+                     FuelCapacity = vehicleDto.FuelCapacity,
+                     MaxAllowedWeight = vehicleDto.MaxAllowedWeight,
+                     MinWeight = vehicleDto.MinWeight,
+                     BaggageVolume = vehicleDto.BaggageVolume,
+                     DrivenKM = vehicleDto.DrivenKM,
+                     ModelId = vehicleDto.ModelId,
+                     EngineId = vehicleDto.EngineId
+                 }).ToList()))
+                 .ReverseMap()
+                 .ForMember(dest => dest.AddressDto, opt => opt.MapFrom(src => src.Address))
+                 .ForMember(dest => dest.VehiclesDto, opt => opt.MapFrom(src => src.Vehicles.Select(vehicle => new VehicleDto
+                 {
+                     Vin = vehicle.Vin,
+                     Averagefuelin = vehicle.Averagefuelin,
+                     Averagefuelout = vehicle.Averagefuelout,
+                     COemmission = vehicle.COemmission,
+                     FuelCapacity = vehicle.FuelCapacity,
+                     MaxAllowedWeight = vehicle.MaxAllowedWeight,
+                     MinWeight = vehicle.MinWeight,
+                     BaggageVolume = vehicle.BaggageVolume,
+                     DrivenKM = vehicle.DrivenKM,
+                     ModelId = vehicle.ModelId,
+                     EngineId = vehicle.EngineId
+                 }).ToList()));
 
 
         }
+
+        // Custom type converters if needed
+       
     }
 }

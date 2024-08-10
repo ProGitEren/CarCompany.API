@@ -1,13 +1,17 @@
-﻿using Infrastucture.Errors;
+﻿using Infrastucture.DTO.Dto_Vehicles;
+using Infrastucture.Errors;
+using Infrastucture.Map;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Infrastucture.Map.MappingUser;
 
 namespace Infrastucture.Configuration
 {

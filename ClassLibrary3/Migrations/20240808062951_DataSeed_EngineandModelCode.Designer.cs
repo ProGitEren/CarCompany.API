@@ -4,6 +4,7 @@ using Infrastucture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240808062951_DataSeed_EngineandModelCode")]
+    partial class DataSeed_EngineandModelCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -536,7 +539,7 @@ namespace Infrastucture.Migrations
                     b.Property<int>("DrivenKM")
                         .HasColumnType("int");
 
-                    b.Property<int>("EngineId")
+                    b.Property<int?>("EngineId")
                         .HasColumnType("int");
 
                     b.Property<int>("FuelCapacity")
@@ -548,16 +551,11 @@ namespace Infrastucture.Migrations
                     b.Property<int>("MinWeight")
                         .HasColumnType("int");
 
-                    b.Property<int>("ModelId")
+                    b.Property<int?>("ModelId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Vin");
 
@@ -636,14 +634,12 @@ namespace Infrastucture.Migrations
                     b.HasOne("Models.Entities.Engines", "Engine")
                         .WithMany("Vehicles")
                         .HasForeignKey("EngineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Models.Entities.VehicleModels", "VehicleModel")
                         .WithMany("Vehicles")
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("ClassLibrary2.Entities.AppUsers", "User")
                         .WithMany("Vehicles")

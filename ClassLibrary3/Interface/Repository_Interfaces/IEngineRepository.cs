@@ -9,5 +9,6 @@ namespace Infrastucture.Interface.Repository_Interfaces
 {
     public interface IEngineRepository : IGenericRepository<Engines, int?>
     {
+        Engines GetByEngineCode(string engineCode);
     }
 }
