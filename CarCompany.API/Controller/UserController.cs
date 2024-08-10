@@ -212,14 +212,14 @@ namespace CarCompany.API.Controller
 
             // THIS IS VERY IMPORTANT AS THE HTML CONTEXT CAN BE CHANGED THE STRING SHOULD BE CHECKED HERE
 
-            if (registerdto.Role.ToLower() == "admin")
-            {
-                _logger.Error("Registration failed for {Role}: Unauthorized user tried to register as ADMIN!!, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = [$"You are not authorized to register as Admin to the system."]
-                });
-            }
+            //if (registerdto.Role.ToLower() == "admin")
+            //{
+            //    _logger.Error("Registration failed for {Role}: Unauthorized user tried to register as ADMIN!!, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
+            //    return new BadRequestObjectResult(new ApiValidationErrorResponse
+            //    {
+            //        Errors = [$"You are not authorized to register as Admin to the system."]
+            //    });
+            //}
 
             var address = _mapper.Map<Address>(registerdto.Address);
             
