@@ -17,11 +17,7 @@ namespace Infrastucture.Repository
 
         }
 
-        public VehicleModels GetModelByCode(string ModelCode)
-        {
-            var model = this.GetAll().FirstOrDefault(x => x.ModelCode == ModelCode);
-            return model;
-        }
+       
 
 
     }

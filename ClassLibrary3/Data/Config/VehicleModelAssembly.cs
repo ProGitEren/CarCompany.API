@@ -28,9 +28,7 @@ namespace Infrastucture.Data.Config
             // Instances Configurations
 
             builder.Property(x => x.Quantity).IsRequired().HasDefaultValue(1);
-            builder.Property(x => x.securityCode).IsRequired().HasColumnType("nchar(1)");
             builder.Property(x => x.ManufacturedCountry).IsRequired();
-            builder.Property(x => x.securityCode).IsRequired().HasColumnType("nchar(1)");
             builder.Property(x => x.Manufacturer).IsRequired().HasColumnType("nchar(2)");
             builder.Property(x => x.ManufacturedPlant).IsRequired().HasColumnType("nchar(1)");
             builder.Property(x => x.ManufacturedYear).IsRequired().HasColumnType("nchar(1)");
@@ -38,8 +36,6 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.EngineCode).IsRequired().HasColumnType("nchar(5)");
             builder.Property(x => x.ModelLongName).HasMaxLength(100);
             builder.Property(x => x.ModelShortName).HasMaxLength(20);
-            builder.Property(x => x.ModelCode).IsRequired().HasColumnType("nchar(4)");
-
             builder.Property(x => x.VehicleType).HasConversion(o => o.ToString(), o => (VehicleType)Enum.Parse(typeof(VehicleType), o.ToString()) );
 
             
@@ -68,11 +64,9 @@ namespace Infrastucture.Data.Config
                     ManufacturedPlant = "A",
                     ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2020).ToString(),
                     EngineCode = "EN123",
-                    securityCode = "A",
                     Manufacturer = "TM",
                     ModelLongName = "Toyota Camry",
                     ModelShortName = "Camry",
-                    ModelCode = "TC24",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -84,11 +78,9 @@ namespace Infrastucture.Data.Config
                     ManufacturedPlant = "B",
                     ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2021).ToString(),
                     EngineCode = "EN456",
-                    securityCode = "B",
                     Manufacturer = "FD",
                     ModelLongName = "Ford Mustang",
                     ModelShortName = "Mustang",
-                    ModelCode = "FM40",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -100,11 +92,9 @@ namespace Infrastucture.Data.Config
                     ManufacturedPlant = "C",
                     ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2019).ToString(),
                     EngineCode = "EN789",
-                    securityCode = "C",
                     Manufacturer = "BM",
                     ModelLongName = "BMW X5",
                     ModelShortName = "X5",
-                    ModelCode = "BM58",
                     VehicleType = VehicleType.SUV
                 },
                 new VehicleModels
@@ -116,11 +106,9 @@ namespace Infrastucture.Data.Config
                     ManufacturedPlant = "D",
                     ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2018).ToString(),
                     EngineCode = "EN101",
-                    securityCode = "D",
                     Manufacturer = "HN",
                     ModelLongName = "Honda Civic",
                     ModelShortName = "Civic",
-                    ModelCode = "HN75",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -132,11 +120,9 @@ namespace Infrastucture.Data.Config
                     ManufacturedPlant = "E",
                     ManufacturedYear = VinYearMapper.GetManufacturedYearCode(2017).ToString(),
                     EngineCode = "EN202",
-                    securityCode = "E",
                     Manufacturer = "NS",
                     ModelLongName = "Nissan Altima",
                     ModelShortName = "Altima",
-                    ModelCode = "NA54",
                     VehicleType = VehicleType.Automobile
                 }
             );

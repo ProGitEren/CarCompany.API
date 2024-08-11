@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Models.Entities;
+using WebAPI.Validation;
 
 namespace WebAPI.Controller
 {
@@ -46,6 +47,12 @@ namespace WebAPI.Controller
             {
                 _logger.Warning("The Current User could nto be found in the system.");
                 return NotFound(new ApiException(404, "The Current User could not be found in the system."));
+            }
+            var validationerrorlist = EntityValidator.GetValidationResults(_mapper.Map<Vehicles>(dto));
+
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
             }
 
             var vehicle = _mapper.Map<Vehicles>(dto);
@@ -154,6 +161,13 @@ namespace WebAPI.Controller
             }
             _mapper.Map(dto, vehicle);
 
+            var validationerrorlist = EntityValidator.GetValidationResults(vehicle);
+
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
+
             try
             {
                 await _uow.VehicleRepository.UpdateAsync(vehicle);
@@ -175,7 +189,7 @@ namespace WebAPI.Controller
 
         public async Task<IActionResult> DeleteVehicleAsync(string? Id)
         {
-            var vehicle = _uow.VehicleRepository.GetByIdAsync(Id);
+            var vehicle = await _uow.VehicleRepository.GetByIdAsync(Id);
 
             if (vehicle == null)
             {
@@ -187,7 +201,7 @@ namespace WebAPI.Controller
             {
                 await _uow.VehicleRepository.DeleteAsync(Id);
                 _logger.Information("Vehicle is successfully deleted.");
-                return Ok(vehicle);
+                return Ok("Vehicle successfully deleted.");
             }
             catch (Exception ex)
             {

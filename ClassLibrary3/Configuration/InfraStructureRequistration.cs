@@ -111,6 +111,15 @@ namespace Infrastucture.Configuration
             return services;
         }
 
+        public static async void InfraStructureConfigurationMiddleware(IApplicationBuilder app) 
+        {
+            using (var scope = app.ApplicationServices.CreateScope()) 
+            {
+                var usermanager = scope.ServiceProvider.GetRequiredService<UserManager<AppUsers>>();
+                await IdentitySeedConfiguration.SeedUserAsync(usermanager);
+            }
+        }
+
     }
 
 }

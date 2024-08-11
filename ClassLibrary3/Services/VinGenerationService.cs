@@ -43,7 +43,7 @@ namespace Infrastucture.Services
             vinBuilder.Append(vehicleModel.ManufacturedCountry);
             vinBuilder.Append(vehicleModel.Manufacturer);
             vinBuilder.Append(vehicleModel.EngineCode);
-            vinBuilder.Append(vehicleModel.securityCode);
+            vinBuilder.Append(vehicleModel.CheckDigit);
             vinBuilder.Append(vehicleModel.ManufacturedYear);
             vinBuilder.Append(vehicleModel.ManufacturedPlant);
 

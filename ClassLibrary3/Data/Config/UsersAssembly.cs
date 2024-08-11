@@ -50,6 +50,10 @@ namespace Infrastucture.Data.Config
             // This is important as a user can have a vehicle or not 
 
 
+            // Seed Data
+
+           
+
 
         }
     }

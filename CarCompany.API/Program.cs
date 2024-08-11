@@ -79,6 +79,8 @@ app.UseAuthorization();
 app.UseStaticFiles();
 app.MapControllers();
 
+//Seed The first User Admin
+InfraStructureRequistration.InfraStructureConfigurationMiddleware(app);
 
 app.Run();
 

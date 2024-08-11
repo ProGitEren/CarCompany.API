@@ -96,7 +96,7 @@ namespace Infrastucture.Extensions
 
             }
 
-            return listusers as IReadOnlyList<AppUsers> ;
+            return listusers as IReadOnlyList<AppUsers?> ;
         }
 
         public static async Task<bool> IsPasswordUniqueAsync(this UserManager<AppUsers> userManager, string password, Serilog.ILogger logger, IPasswordHasher<AppUsers> passwordhasher, string? correlationId)

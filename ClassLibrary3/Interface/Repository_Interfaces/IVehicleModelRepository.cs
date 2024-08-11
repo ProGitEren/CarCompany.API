@@ -9,7 +9,7 @@ namespace Infrastucture.Interface.Repository_Interfaces
 {
     public interface IVehicleModelRepository : IGenericRepository<VehicleModels, int?>
     {
-        VehicleModels GetModelByCode(string ModelCode);
+      
 
     }
 

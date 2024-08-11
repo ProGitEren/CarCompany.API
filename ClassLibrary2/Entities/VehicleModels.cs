@@ -21,8 +21,6 @@ namespace Models.Entities
 
         public string ModelLongName { get; set; }
 
-        public string ModelCode { get; set; }
-
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
 
@@ -37,8 +35,6 @@ namespace Models.Entities
         public int ManufacturedCountry { get; set; } //1 number
         public string Manufacturer { get; set; } //2 letter
 
-        [ValidCharacters("0123456789ABCDEFGHJKLMNPRSTUVWXYZ")]
-        public string securityCode { get; set; } // 1 letter
 
         [ValidCharacters("ABCDEFGHJKLMNPRSTVWXY1234567890")]
         public string ManufacturedYear { get; set; } // 1 letter
@@ -47,7 +43,7 @@ namespace Models.Entities
         public string ManufacturedPlant { get; set; }// 1 letter
 
         [ValidCharacters("0123456789X")]
-        public string CheckDigit { get; set; }
+        public string CheckDigit { get; set; } // 1 letter
 
 
         // Navigational Property
