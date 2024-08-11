@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Net;
 using Infrastucture.DTO.Dto_Users;
 using Infrastucture.DTO.Dto_Address;
+using Infrastucture.DTO.Dto_Vehicles;
 
 
 
@@ -210,7 +211,7 @@ namespace CarCompany.API.Controller
                 });
             }
 
-            // THIS IS VERY IMPORTANT AS THE HTML CONTEXT CAN BE CHANGED THE STRING SHOULD BE CHECKED HERE
+            //THIS IS VERY IMPORTANT AS THE HTML CONTEXT CAN BE CHANGED THE STRING SHOULD BE CHECKED HERE
 
             if (registerdto.Role.ToLower() == "admin")
             {
@@ -576,7 +577,7 @@ namespace CarCompany.API.Controller
             }
 
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            var userwithaddressdto = _mapper.Map<UserwithdetailsDto>(user);
+                    var userwithaddressdto = _mapper.Map<UserwithdetailsDto>(user);
             userwithaddressdto.Token = token;
 
             _logger.Information("Current user with address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);

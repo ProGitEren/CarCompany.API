@@ -31,6 +31,16 @@ namespace Infrastucture.Extensions
 
         }
 
+
+        public static async Task<AppUsers> FindEmailByEmailAsync(this UserManager<AppUsers> userManager, string? Email)
+        {
+            var appUser = userManager.Users.Where(x => x.Email == Email).Include(x => x.Address).Include(x => x.Vehicles).SingleOrDefault();
+            
+            return appUser;
+
+        }
+
+
         public static async Task<AppUsers> AddRolestoUserAsync(this UserManager<AppUsers> userManager, AppUsers user)
         {
             
@@ -73,6 +83,7 @@ namespace Infrastucture.Extensions
             return users;
 
         }
+
 
         public static async Task<IReadOnlyList<AppUsers?>> AddRolestoListAsync(this UserManager<AppUsers> userManager, IList<AppUsers> listusers)
         {

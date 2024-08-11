@@ -14,7 +14,13 @@ namespace Infrastucture.Repository
 
         public EngineRepository(ApplicationDbContext context) : base(context)
         {
-
+            
+        }
+        
+        public Engines GetByEngineCode(string enginecode) 
+        {
+            var engine = this.GetAll().FirstOrDefault(x => x.EngineCode == enginecode);
+            return engine;
         }
     }
 }

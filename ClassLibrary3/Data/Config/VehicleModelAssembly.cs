@@ -38,10 +38,14 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.EngineCode).IsRequired().HasColumnType("nchar(5)");
             builder.Property(x => x.ModelLongName).HasMaxLength(100);
             builder.Property(x => x.ModelShortName).HasMaxLength(20);
+            builder.Property(x => x.ModelCode).IsRequired().HasColumnType("nchar(4)");
 
             builder.Property(x => x.VehicleType).HasConversion(o => o.ToString(), o => (VehicleType)Enum.Parse(typeof(VehicleType), o.ToString()) );
 
+            
 
+            
+            
             // Navigational Configurations
 
             builder.HasMany(e => e.Vehicles)
@@ -68,6 +72,7 @@ namespace Infrastucture.Data.Config
                     Manufacturer = "TM",
                     ModelLongName = "Toyota Camry",
                     ModelShortName = "Camry",
+                    ModelCode = "TC24",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -83,6 +88,7 @@ namespace Infrastucture.Data.Config
                     Manufacturer = "FD",
                     ModelLongName = "Ford Mustang",
                     ModelShortName = "Mustang",
+                    ModelCode = "FM40",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -98,6 +104,7 @@ namespace Infrastucture.Data.Config
                     Manufacturer = "BM",
                     ModelLongName = "BMW X5",
                     ModelShortName = "X5",
+                    ModelCode = "BM58",
                     VehicleType = VehicleType.SUV
                 },
                 new VehicleModels
@@ -113,6 +120,7 @@ namespace Infrastucture.Data.Config
                     Manufacturer = "HN",
                     ModelLongName = "Honda Civic",
                     ModelShortName = "Civic",
+                    ModelCode = "HN75",
                     VehicleType = VehicleType.Automobile
                 },
                 new VehicleModels
@@ -128,6 +136,7 @@ namespace Infrastucture.Data.Config
                     Manufacturer = "NS",
                     ModelLongName = "Nissan Altima",
                     ModelShortName = "Altima",
+                    ModelCode = "NA54",
                     VehicleType = VehicleType.Automobile
                 }
             );

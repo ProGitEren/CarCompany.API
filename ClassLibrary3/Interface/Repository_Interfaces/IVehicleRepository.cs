@@ -10,6 +10,7 @@ namespace Infrastucture.Interface.Repository_Interfaces
 {
     public interface IVehicleRepository : IGenericRepository<Vehicles, string?>
     {
-
     }
+
+
 }

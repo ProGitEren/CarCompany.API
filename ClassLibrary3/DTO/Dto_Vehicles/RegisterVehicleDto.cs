@@ -11,6 +11,7 @@ namespace Infrastucture.DTO.Dto_Vehicles
 {
     public class RegisterVehicleDto
     {
+        public string UserName { get; set; }
         public decimal Averagefuelin { get; set; }
         public decimal Averagefuelout { get; set; }
         public int COemmission { get; set; }
@@ -19,6 +20,10 @@ namespace Infrastucture.DTO.Dto_Vehicles
         public int MinWeight { get; set; }
         public int BaggageVolume { get; set; }
         public int DrivenKM { get; set; }
+        public int ModelName { get; set; }
+        public int? ModelId { get; set; }
+
+        
 
 
 
