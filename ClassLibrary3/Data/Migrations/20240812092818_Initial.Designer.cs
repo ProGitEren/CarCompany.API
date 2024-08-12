@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastucture.Migrations
+namespace Infrastucture.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240810212641_SeedSingleUser")]
-    partial class SeedSingleUser
+    [Migration("20240812092818_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -288,7 +288,7 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1000L);
 
                     b.Property<int>("CompressionRatio")
                         .HasColumnType("int");
@@ -372,7 +372,7 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1000L);
 
                     b.Property<string>("CheckDigit")
                         .IsRequired()
@@ -397,10 +397,6 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nchar(2)");
 
-                    b.Property<string>("ModelCode")
-                        .IsRequired()
-                        .HasColumnType("nchar(4)");
-
                     b.Property<string>("ModelLongName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -423,10 +419,6 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("securityCode")
-                        .IsRequired()
-                        .HasColumnType("nchar(1)");
-
                     b.HasKey("Id");
 
                     b.ToTable("VehicleModels");
@@ -441,13 +433,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "A",
                             ManufacturedYear = "L",
                             Manufacturer = "TM",
-                            ModelCode = "TC24",
                             ModelLongName = "Toyota Camry",
                             ModelShortName = "Camry",
                             ModelYear = 2020,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "A"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -458,13 +448,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "B",
                             ManufacturedYear = "M",
                             Manufacturer = "FD",
-                            ModelCode = "FM40",
                             ModelLongName = "Ford Mustang",
                             ModelShortName = "Mustang",
                             ModelYear = 2021,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "B"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -475,13 +463,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "C",
                             ManufacturedYear = "K",
                             Manufacturer = "BM",
-                            ModelCode = "BM58",
                             ModelLongName = "BMW X5",
                             ModelShortName = "X5",
                             ModelYear = 2019,
                             Quantity = 0,
-                            VehicleType = "SUV",
-                            securityCode = "C"
+                            VehicleType = "SUV"
                         },
                         new
                         {
@@ -492,13 +478,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "D",
                             ManufacturedYear = "J",
                             Manufacturer = "HN",
-                            ModelCode = "HN75",
                             ModelLongName = "Honda Civic",
                             ModelShortName = "Civic",
                             ModelYear = 2018,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "D"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -509,13 +493,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "E",
                             ManufacturedYear = "H",
                             Manufacturer = "NS",
-                            ModelCode = "NA54",
                             ModelLongName = "Nissan Altima",
                             ModelShortName = "Altima",
                             ModelYear = 2017,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "E"
+                            VehicleType = "Automobile"
                         });
                 });
 

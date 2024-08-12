@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities;
+using Models.Mapping;
 using WebAPI.Validation;
 
 namespace WebAPI.Controller
@@ -60,6 +61,12 @@ namespace WebAPI.Controller
         public async Task<IActionResult> CreateAsync(RegisterVehicleModelDto dto)
         {
             var vehiclemodel = _mapper.Map<VehicleModels>(dto);
+            vehiclemodel.ManufacturedYear = VinYearMapper.GetManufacturedYearCode(vehiclemodel.ModelYear).ToString();
+            vehiclemodel.Quantity = 1;
+            
+            if(vehiclemodel.Quantity == null || vehiclemodel.Quantity == 0) 
+            vehiclemodel.Quantity = 1; 
+
             var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
 
             if (validationerrorlist.Any())
@@ -119,6 +126,9 @@ namespace WebAPI.Controller
             }
 
             _mapper.Map(dto, vehiclemodel);
+            vehiclemodel.ManufacturedYear = VinYearMapper.GetManufacturedYearCode(dto.ModelYear).ToString();
+            if (vehiclemodel.Quantity == null || vehiclemodel.Quantity == 0)
+                vehiclemodel.Quantity = 1;
 
             var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
 
@@ -155,7 +165,7 @@ namespace WebAPI.Controller
                 _logger.Warning("This model could not be found in the system.");
                 return NotFound(new ApiException(404, "This model did not found in the system."));
             }
-
+            
             try
             {
                 await _uow.VehicleModelRepository.DeleteAsync(Id);

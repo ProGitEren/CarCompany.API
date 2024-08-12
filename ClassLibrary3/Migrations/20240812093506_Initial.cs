@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastucture.Migrations
 {
     /// <inheritdoc />
-    public partial class EngineCodeChange_SeedData : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,7 +48,7 @@ namespace Infrastucture.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("SqlServer:Identity", "1000, 1"),
                     Volume = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     Hp = table.Column<int>(type: "int", nullable: false),
                     CompressionRatio = table.Column<int>(type: "int", nullable: false),
@@ -66,7 +66,7 @@ namespace Infrastucture.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("SqlServer:Identity", "1000, 1"),
                     VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EngineCode = table.Column<string>(type: "nchar(5)", nullable: false),
                     ModelShortName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -75,7 +75,6 @@ namespace Infrastucture.Migrations
                     ModelYear = table.Column<int>(type: "int", nullable: false),
                     ManufacturedCountry = table.Column<int>(type: "int", nullable: false),
                     Manufacturer = table.Column<string>(type: "nchar(2)", nullable: false),
-                    securityCode = table.Column<string>(type: "nchar(1)", nullable: false),
                     ManufacturedYear = table.Column<string>(type: "nchar(1)", nullable: false),
                     ManufacturedPlant = table.Column<string>(type: "nchar(1)", nullable: false),
                     CheckDigit = table.Column<string>(type: "nchar(1)", nullable: false)
@@ -233,6 +232,7 @@ namespace Infrastucture.Migrations
                 columns: table => new
                 {
                     Vin = table.Column<string>(type: "nchar(17)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
                     Averagefuelin = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     Averagefuelout = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     COemmission = table.Column<int>(type: "int", nullable: false),
@@ -241,8 +241,8 @@ namespace Infrastucture.Migrations
                     MinWeight = table.Column<int>(type: "int", nullable: false),
                     BaggageVolume = table.Column<int>(type: "int", nullable: false),
                     DrivenKM = table.Column<int>(type: "int", nullable: false),
-                    ModelId = table.Column<int>(type: "int", nullable: true),
-                    EngineId = table.Column<int>(type: "int", nullable: true),
+                    ModelId = table.Column<int>(type: "int", nullable: false),
+                    EngineId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -276,19 +276,39 @@ namespace Infrastucture.Migrations
                     { 1001, 11, "EN456", 250, 350, 3.5m, 10.0m },
                     { 1002, 12, "EN789", 300, 400, 4.0m, 11.0m },
                     { 1003, 9, "EN101", 120, 180, 1.6m, 7.5m },
-                    { 1004, 10, "EN202", 200, 250, 2.5m, 9.0m }
+                    { 1004, 10, "EN202", 200, 250, 2.5m, 9.0m },
+                    { 1005, 12, "F1V8", 450, 500, 5.0m, 12.0m },
+                    { 1006, 0, "F2EM", 200, 300, 0.0m, 0.0m },
+                    { 1007, 11, "F3HY", 350, 450, 2.5m, 9.5m },
+                    { 1008, 10, "F4V6", 350, 400, 3.0m, 10.5m },
+                    { 1009, 11, "T1V8", 400, 450, 4.5m, 11.5m },
+                    { 1010, 0, "T2EM", 250, 350, 0.0m, 0.0m },
+                    { 1011, 10, "T3HY", 300, 400, 2.5m, 9.5m },
+                    { 1012, 10, "T4V6", 325, 375, 3.0m, 10.5m },
+                    { 1013, 12, "B1V8", 450, 500, 4.5m, 12.0m },
+                    { 1014, 0, "B2EM", 250, 350, 0.0m, 0.0m },
+                    { 1015, 11, "B3HY", 300, 400, 2.5m, 9.5m },
+                    { 1016, 10, "B4V6", 325, 375, 3.0m, 10.5m },
+                    { 1017, 12, "H1V8", 450, 500, 4.5m, 12.0m },
+                    { 1018, 0, "H2EM", 250, 350, 0.0m, 0.0m },
+                    { 1019, 11, "H3HY", 300, 400, 2.5m, 9.5m },
+                    { 1020, 10, "H4V6", 325, 375, 3.0m, 10.5m },
+                    { 1021, 12, "M1V8", 450, 500, 4.5m, 12.0m },
+                    { 1022, 0, "M2EM", 250, 350, 0.0m, 0.0m },
+                    { 1023, 11, "M3HY", 300, 400, 2.5m, 9.5m },
+                    { 1024, 10, "M4V6", 325, 375, 3.0m, 10.5m }
                 });
 
             migrationBuilder.InsertData(
                 table: "VehicleModels",
-                columns: new[] { "Id", "CheckDigit", "EngineCode", "ManufacturedCountry", "ManufacturedPlant", "ManufacturedYear", "Manufacturer", "ModelLongName", "ModelShortName", "ModelYear", "VehicleType", "securityCode" },
+                columns: new[] { "Id", "CheckDigit", "EngineCode", "ManufacturedCountry", "ManufacturedPlant", "ManufacturedYear", "Manufacturer", "ModelLongName", "ModelShortName", "ModelYear", "VehicleType" },
                 values: new object[,]
                 {
-                    { 1000, "1", "EN123", 1, "A", "L", "TM", "Toyota Camry", "Camry", 2020, "Automobile", "A" },
-                    { 1001, "2", "EN456", 2, "B", "M", "FD", "Ford Mustang", "Mustang", 2021, "Automobile", "B" },
-                    { 1002, "3", "EN789", 1, "C", "K", "BM", "BMW X5", "X5", 2019, "SUV", "C" },
-                    { 1003, "4", "EN101", 1, "D", "J", "HN", "Honda Civic", "Civic", 2018, "Automobile", "D" },
-                    { 1004, "5", "EN202", 1, "E", "H", "NS", "Nissan Altima", "Altima", 2017, "Automobile", "E" }
+                    { 1000, "1", "EN123", 1, "A", "L", "TM", "Toyota Camry", "Camry", 2020, "Automobile" },
+                    { 1001, "2", "EN456", 2, "B", "M", "FD", "Ford Mustang", "Mustang", 2021, "Automobile" },
+                    { 1002, "3", "EN789", 1, "C", "K", "BM", "BMW X5", "X5", 2019, "SUV" },
+                    { 1003, "4", "EN101", 1, "D", "J", "HN", "Honda Civic", "Civic", 2018, "Automobile" },
+                    { 1004, "5", "EN202", 1, "E", "H", "NS", "Nissan Altima", "Altima", 2017, "Automobile" }
                 });
 
             migrationBuilder.CreateIndex(

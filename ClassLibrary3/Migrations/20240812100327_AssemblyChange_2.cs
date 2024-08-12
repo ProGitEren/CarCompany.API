@@ -5,7 +5,7 @@
 namespace Infrastucture.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedSingleUser : Migration
+    public partial class AssemblyChange_2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

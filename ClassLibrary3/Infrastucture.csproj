@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\migrations\**" />
+    <EmbeddedResource Remove="Data\migrations\**" />
+    <None Remove="Data\migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
@@ -29,10 +35,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary2\Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\migrations\" />
   </ItemGroup>
 
 </Project>

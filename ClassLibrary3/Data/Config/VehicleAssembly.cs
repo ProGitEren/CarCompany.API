@@ -37,13 +37,10 @@ namespace Infrastucture.Data.Config
             builder.Property(e => e.DrivenKM).IsRequired();
             builder.Property(e => e.UserName).IsRequired().HasMaxLength(25);
                     
-            builder.Property(e => e.EngineId).IsRequired();
-            builder.Property(e => e.ModelId).IsRequired();
-
+            
             // Vehicle should have a model and engine
             builder.Property(x => x.ModelId).IsRequired();
             builder.Property(x => x.EngineId).IsRequired();
-
             builder.Property(x => x.UserId).IsRequired(false);
 
 
