@@ -62,7 +62,6 @@ namespace WebAPI.Controller
         {
             var vehiclemodel = _mapper.Map<VehicleModels>(dto);
             vehiclemodel.ManufacturedYear = VinYearMapper.GetManufacturedYearCode(vehiclemodel.ModelYear).ToString();
-            vehiclemodel.Quantity = 1;
             
             if(vehiclemodel.Quantity == null || vehiclemodel.Quantity == 0) 
             vehiclemodel.Quantity = 1; 

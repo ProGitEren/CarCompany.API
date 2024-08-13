@@ -40,7 +40,6 @@ namespace Infrastucture.Map
                     DrivenKM = vehicleDto.DrivenKM,
                     ModelId = vehicleDto.ModelId,
                     EngineId = vehicleDto.EngineId,
-                    UserId = vehicleDto.UserId,
                 }).ToList()))
                 .ReverseMap()
                 .ForMember(dest => dest.AddressDto, opt => opt.MapFrom(src => src.Address))
@@ -57,7 +56,6 @@ namespace Infrastucture.Map
                     DrivenKM = vehicle.DrivenKM,
                     ModelId = vehicle.ModelId,
                     EngineId = vehicle.EngineId,
-                    UserId = vehicle.UserId
 
                 }).ToList()));
 

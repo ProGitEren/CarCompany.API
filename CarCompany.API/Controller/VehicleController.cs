@@ -71,6 +71,7 @@ namespace WebAPI.Controller
             {
                 vehicle.UserId = user.Id;
             }
+
             try
             {
                 await _uow.VehicleRepository.AddAsync(vehicle);
