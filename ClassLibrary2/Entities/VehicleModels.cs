@@ -31,7 +31,7 @@ namespace Models.Entities
 
         // To be used for VIN
 
-        [CustomAllowedValues(1, 2, 3, 4, 5, 6)]
+        [CustomAllowedValues(1, 2, 3, 4, 5, 6, 7 , 8 , 9)]
         public int ManufacturedCountry { get; set; } //1 number
         public string Manufacturer { get; set; } //2 letter
 

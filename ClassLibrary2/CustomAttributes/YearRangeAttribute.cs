@@ -21,7 +21,7 @@ namespace Models.CustomAttributes
             if (value is int year)
             { 
                     int currentYear = DateTime.Now.Year;
-                if (year >= currentYear && year <= currentYear) 
+                if (year >= _minimumYear && year <= currentYear) 
                 {
                     return ValidationResult.Success;
                 }

@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Infrastucture.Migrations
+namespace Infrastucture.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class VehicleDesktop : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

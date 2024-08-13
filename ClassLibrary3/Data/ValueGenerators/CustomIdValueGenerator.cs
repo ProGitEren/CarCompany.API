@@ -9,27 +9,23 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.Data.ValueGenerators
 {
-    public class CustomIdValueGenerator<T> : ValueGenerator<int> where T : BaseEntity<int>
+    public class CustomIdValueGenerator<T> : ValueGenerator where T : BaseEntity<int>
     {
-        private static int _currentMaxId;
-        private readonly ApplicationDbContext _context;
         public override bool GeneratesTemporaryValues => false;
-
-        public CustomIdValueGenerator(ApplicationDbContext context)
+        private ApplicationDbContext _context;
+        private static int _currentMaxId; 
+        public CustomIdValueGenerator()
         {
-            _context = context;
-            _currentMaxId = (_context.Set<T>().Max(x => x.Id)) > 999 ? _context.Set<T>().Max(x => x.Id) : 999;
+            
         }
-        public override int Next(EntityEntry entry)
+        protected override object NextValue(EntityEntry entry)
         {
+            _context = (ApplicationDbContext)entry.Context;
+            _currentMaxId = (_context.Set<T>().Max(x => x.Id)) > 999 ? _context.Set<T>().Max(x => x.Id) : 999;
             Interlocked.Increment(ref _currentMaxId);
             return _currentMaxId;
         }
 
-        public override ValueTask<int> NextAsync(EntityEntry entry, CancellationToken cancellationToken = default)
-        {
-            Interlocked.Increment(ref _currentMaxId);
-            return new ValueTask<int>(_currentMaxId);
-        }
+       
     }
 }

@@ -21,8 +21,7 @@ namespace Infrastucture.Data.Config
             builder.HasKey(x => x.Id);
 
             builder.Property(u => u.Id)
-                   .HasValueGenerator<CustomIdValueGenerator<VehicleModels>>() // Use custom value generator
-                   .IsRequired();
+                   .UseIdentityColumn(seed: 1000, increment: 1);
 
 
             // Instances Configurations
@@ -38,16 +37,16 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.ModelShortName).HasMaxLength(20);
             builder.Property(x => x.VehicleType).HasConversion(o => o.ToString(), o => (VehicleType)Enum.Parse(typeof(VehicleType), o.ToString()) );
 
-            
+                    
 
             
             
             // Navigational Configurations
 
-            builder.HasMany(e => e.Vehicles)
-                .WithOne(x => x.VehicleModel)
-                .HasForeignKey(y=>y.ModelId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasMany(e => e.Vehicles)
+            //    .WithOne(x => x.VehicleModel)
+            //    .HasForeignKey(y=>y.ModelId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
 
 

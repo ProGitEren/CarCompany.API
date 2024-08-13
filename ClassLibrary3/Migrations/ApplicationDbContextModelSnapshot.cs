@@ -285,7 +285,7 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1000L);
 
                     b.Property<int>("CompressionRatio")
                         .HasColumnType("int");
@@ -360,6 +360,206 @@ namespace Infrastucture.Migrations
                             Torque = 250,
                             Volume = 2.5m,
                             diameterCm = 9.0m
+                        },
+                        new
+                        {
+                            Id = 1005,
+                            CompressionRatio = 12,
+                            EngineCode = "F1V8",
+                            Hp = 450,
+                            Torque = 500,
+                            Volume = 5.0m,
+                            diameterCm = 12.0m
+                        },
+                        new
+                        {
+                            Id = 1006,
+                            CompressionRatio = 0,
+                            EngineCode = "F2EM",
+                            Hp = 200,
+                            Torque = 300,
+                            Volume = 0.0m,
+                            diameterCm = 0.0m
+                        },
+                        new
+                        {
+                            Id = 1007,
+                            CompressionRatio = 11,
+                            EngineCode = "F3HY",
+                            Hp = 350,
+                            Torque = 450,
+                            Volume = 2.5m,
+                            diameterCm = 9.5m
+                        },
+                        new
+                        {
+                            Id = 1008,
+                            CompressionRatio = 10,
+                            EngineCode = "F4V6",
+                            Hp = 350,
+                            Torque = 400,
+                            Volume = 3.0m,
+                            diameterCm = 10.5m
+                        },
+                        new
+                        {
+                            Id = 1009,
+                            CompressionRatio = 11,
+                            EngineCode = "T1V8",
+                            Hp = 400,
+                            Torque = 450,
+                            Volume = 4.5m,
+                            diameterCm = 11.5m
+                        },
+                        new
+                        {
+                            Id = 1010,
+                            CompressionRatio = 0,
+                            EngineCode = "T2EM",
+                            Hp = 250,
+                            Torque = 350,
+                            Volume = 0.0m,
+                            diameterCm = 0.0m
+                        },
+                        new
+                        {
+                            Id = 1011,
+                            CompressionRatio = 10,
+                            EngineCode = "T3HY",
+                            Hp = 300,
+                            Torque = 400,
+                            Volume = 2.5m,
+                            diameterCm = 9.5m
+                        },
+                        new
+                        {
+                            Id = 1012,
+                            CompressionRatio = 10,
+                            EngineCode = "T4V6",
+                            Hp = 325,
+                            Torque = 375,
+                            Volume = 3.0m,
+                            diameterCm = 10.5m
+                        },
+                        new
+                        {
+                            Id = 1013,
+                            CompressionRatio = 12,
+                            EngineCode = "B1V8",
+                            Hp = 450,
+                            Torque = 500,
+                            Volume = 4.5m,
+                            diameterCm = 12.0m
+                        },
+                        new
+                        {
+                            Id = 1014,
+                            CompressionRatio = 0,
+                            EngineCode = "B2EM",
+                            Hp = 250,
+                            Torque = 350,
+                            Volume = 0.0m,
+                            diameterCm = 0.0m
+                        },
+                        new
+                        {
+                            Id = 1015,
+                            CompressionRatio = 11,
+                            EngineCode = "B3HY",
+                            Hp = 300,
+                            Torque = 400,
+                            Volume = 2.5m,
+                            diameterCm = 9.5m
+                        },
+                        new
+                        {
+                            Id = 1016,
+                            CompressionRatio = 10,
+                            EngineCode = "B4V6",
+                            Hp = 325,
+                            Torque = 375,
+                            Volume = 3.0m,
+                            diameterCm = 10.5m
+                        },
+                        new
+                        {
+                            Id = 1017,
+                            CompressionRatio = 12,
+                            EngineCode = "H1V8",
+                            Hp = 450,
+                            Torque = 500,
+                            Volume = 4.5m,
+                            diameterCm = 12.0m
+                        },
+                        new
+                        {
+                            Id = 1018,
+                            CompressionRatio = 0,
+                            EngineCode = "H2EM",
+                            Hp = 250,
+                            Torque = 350,
+                            Volume = 0.0m,
+                            diameterCm = 0.0m
+                        },
+                        new
+                        {
+                            Id = 1019,
+                            CompressionRatio = 11,
+                            EngineCode = "H3HY",
+                            Hp = 300,
+                            Torque = 400,
+                            Volume = 2.5m,
+                            diameterCm = 9.5m
+                        },
+                        new
+                        {
+                            Id = 1020,
+                            CompressionRatio = 10,
+                            EngineCode = "H4V6",
+                            Hp = 325,
+                            Torque = 375,
+                            Volume = 3.0m,
+                            diameterCm = 10.5m
+                        },
+                        new
+                        {
+                            Id = 1021,
+                            CompressionRatio = 12,
+                            EngineCode = "M1V8",
+                            Hp = 450,
+                            Torque = 500,
+                            Volume = 4.5m,
+                            diameterCm = 12.0m
+                        },
+                        new
+                        {
+                            Id = 1022,
+                            CompressionRatio = 0,
+                            EngineCode = "M2EM",
+                            Hp = 250,
+                            Torque = 350,
+                            Volume = 0.0m,
+                            diameterCm = 0.0m
+                        },
+                        new
+                        {
+                            Id = 1023,
+                            CompressionRatio = 11,
+                            EngineCode = "M3HY",
+                            Hp = 300,
+                            Torque = 400,
+                            Volume = 2.5m,
+                            diameterCm = 9.5m
+                        },
+                        new
+                        {
+                            Id = 1024,
+                            CompressionRatio = 10,
+                            EngineCode = "M4V6",
+                            Hp = 325,
+                            Torque = 375,
+                            Volume = 3.0m,
+                            diameterCm = 10.5m
                         });
                 });
 
@@ -369,7 +569,7 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1000L);
 
                     b.Property<string>("CheckDigit")
                         .IsRequired()
@@ -394,10 +594,6 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nchar(2)");
 
-                    b.Property<string>("ModelCode")
-                        .IsRequired()
-                        .HasColumnType("nchar(4)");
-
                     b.Property<string>("ModelLongName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -420,10 +616,6 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("securityCode")
-                        .IsRequired()
-                        .HasColumnType("nchar(1)");
-
                     b.HasKey("Id");
 
                     b.ToTable("VehicleModels");
@@ -438,13 +630,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "A",
                             ManufacturedYear = "L",
                             Manufacturer = "TM",
-                            ModelCode = "TC24",
                             ModelLongName = "Toyota Camry",
                             ModelShortName = "Camry",
                             ModelYear = 2020,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "A"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -455,13 +645,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "B",
                             ManufacturedYear = "M",
                             Manufacturer = "FD",
-                            ModelCode = "FM40",
                             ModelLongName = "Ford Mustang",
                             ModelShortName = "Mustang",
                             ModelYear = 2021,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "B"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -472,13 +660,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "C",
                             ManufacturedYear = "K",
                             Manufacturer = "BM",
-                            ModelCode = "BM58",
                             ModelLongName = "BMW X5",
                             ModelShortName = "X5",
                             ModelYear = 2019,
                             Quantity = 0,
-                            VehicleType = "SUV",
-                            securityCode = "C"
+                            VehicleType = "SUV"
                         },
                         new
                         {
@@ -489,13 +675,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "D",
                             ManufacturedYear = "J",
                             Manufacturer = "HN",
-                            ModelCode = "HN75",
                             ModelLongName = "Honda Civic",
                             ModelShortName = "Civic",
                             ModelYear = 2018,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "D"
+                            VehicleType = "Automobile"
                         },
                         new
                         {
@@ -506,13 +690,11 @@ namespace Infrastucture.Migrations
                             ManufacturedPlant = "E",
                             ManufacturedYear = "H",
                             Manufacturer = "NS",
-                            ModelCode = "NA54",
                             ModelLongName = "Nissan Altima",
                             ModelShortName = "Altima",
                             ModelYear = 2017,
                             Quantity = 0,
-                            VehicleType = "Automobile",
-                            securityCode = "E"
+                            VehicleType = "Automobile"
                         });
                 });
 
@@ -642,7 +824,7 @@ namespace Infrastucture.Migrations
                     b.HasOne("Models.Entities.VehicleModels", "VehicleModel")
                         .WithMany("Vehicles")
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ClassLibrary2.Entities.AppUsers", "User")
