@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,26 +11,9 @@ namespace Models.Entities
 {
     public class Engines : BaseEntity<int>
     {
-        public enum Cylinder
-        {
-            [EnumMember(Value ="I2")]
-            i2,
-            [EnumMember(Value = "I4")]
-            i4,
-            [EnumMember(Value = "I6")]
-            i6,
-            [EnumMember(Value = "V4")]
-            v4,
-            [EnumMember(Value = "V6")]
-            v6,
-            [EnumMember(Value = "V8")]
-            v8,
-            [EnumMember(Value = "V10")]
-            v10,
-            [EnumMember(Value = "V12")]
-            v12
+        public Cylinder Cylinder { get; set; }
 
-        }
+        public string EngineName { get; set; }
 
         [Range(0,20,ErrorMessage = " The volume of the Engine should not exceed 20 L .")]
         public decimal Volume { get; set; }
@@ -46,6 +30,7 @@ namespace Models.Entities
         [Range(0, 200, ErrorMessage = " The Diameter (Bore) of the Engine should not exceed 200 mm .")]
         public decimal diameterCm { get; set; }
 
+        [StringLength(5,ErrorMessage = "Engine Code should be exactly 5 digits (letter/number)")]
         public string EngineCode { get; set; }
         
         //Navigational Property

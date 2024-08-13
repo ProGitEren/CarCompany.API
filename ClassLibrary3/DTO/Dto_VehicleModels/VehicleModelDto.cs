@@ -1,4 +1,5 @@
-﻿using Models.CustomAttributes;
+﻿using Microsoft.AspNetCore.Http;
+using Models.CustomAttributes;
 using Models.Entities;
 using Models.Enums;
 using System;
@@ -23,7 +24,10 @@ namespace Infrastucture.DTO.Dto_VehicleModels
         public string Manufacturer { get; set; } //2 letter
         public string ManufacturedPlant { get; set; }// 1 letter
         public string CheckDigit { get; set; }
-        public int Quantity { get; set; }   
+        public int Quantity { get; set; }
+        public string ModelPicture { get; set; }
+
+
 
     }
 }

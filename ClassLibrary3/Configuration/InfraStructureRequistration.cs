@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,9 @@ namespace Infrastucture.Configuration
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-
+            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Path.Combine(
+                Directory.GetCurrentDirectory(), "wwwroot"
+                )));
 
             services.AddIdentity<AppUsers, IdentityRole>(options =>
             {

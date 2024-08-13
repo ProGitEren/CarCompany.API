@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.DTO.Dto_Vehicles;
+using Infrastucture.Helpers;
 using Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,11 @@ namespace Infrastucture.Map
     {
         public MappingVehicleModels()
         {
-            
-            CreateMap<VehicleModelDto,VehicleModels>().ReverseMap();
+
+            CreateMap<VehicleModels, VehicleModelDto>().
+            ForMember(d => d.ModelPicture, o => o.MapFrom<VehicleModelUrlResolver>())
+            .ReverseMap();
+            CreateMap<UpdateVehicleModelDto, VehicleModels>().ReverseMap();
             CreateMap<RegisterVehicleModelDto, VehicleModels>().ReverseMap();
 
         }

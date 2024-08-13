@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.DTO.Dto_VehicleModels
 {
-    public class RegisterVehicleModelDto
+    public class UpdateVehicleModelDto
     {
+        public int? Id { get; set; }
         public VehicleType VehicleType { get; set; }
         public string EngineCode { get; set; }
         public string ModelShortName { get; set; }
@@ -20,7 +21,5 @@ namespace Infrastucture.DTO.Dto_VehicleModels
         public string ManufacturedPlant { get; set; }// 1 letter
         public string CheckDigit { get; set; }
         public IFormFile ModelPicture { get; set; }
-
-
     }
 }

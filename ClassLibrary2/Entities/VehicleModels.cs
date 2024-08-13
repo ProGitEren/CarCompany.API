@@ -15,6 +15,8 @@ namespace Models.Entities
        
         public VehicleType VehicleType { get; set; }
 
+        [StringLength(5, ErrorMessage = "Engine Code should be exactly 5 digits (letter/number)")]
+
         public string EngineCode { get; set; }
 
         public string ModelShortName { get; set; }
@@ -27,7 +29,9 @@ namespace Models.Entities
         [YearRange(1980)]
         public int ModelYear { get; set; }
 
+        public string ModelPicture { get; set; }
 
+        public decimal Price { get; set; }
 
         // To be used for VIN
 

@@ -17,6 +17,7 @@ namespace WebAPI.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class EngineController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -32,11 +33,12 @@ namespace WebAPI.Controller
 
 
         [HttpGet("get-all-engines")]
-        [Authorize]
+        
 
         public async Task<IActionResult> GetAll()
         {
             var engines = _uow.EngineRepository.GetAll();
+            
             _logger.Information("Engines are retrieving.");
             if (engines == null)
             {
@@ -81,7 +83,7 @@ namespace WebAPI.Controller
         }
 
 
-        [HttpGet("get-model/{Id}")]
+        [HttpGet("get-engine/{Id}")]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> GetEngineAsync(int? Id)
@@ -95,7 +97,7 @@ namespace WebAPI.Controller
                 return NotFound(new ApiException(404, "This engine did not found in the system."));
             }
 
-            var dto = _mapper.Map<VehicleModelDto>(engine);
+            var dto = _mapper.Map<EngineDto>(engine);
 
             return Ok(dto);
 

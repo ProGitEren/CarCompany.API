@@ -58,6 +58,7 @@ namespace WebAPI.Controller
             var vehicle = _mapper.Map<Vehicles>(dto);
             var vehiclemodel = await _uow.VehicleModelRepository.GetByIdAsync(dto.ModelId);
             var engine = _uow.EngineRepository.GetByEngineCode(vehiclemodel.EngineCode);
+            
 
 
             vehicle.ModelId = vehiclemodel.Id;
@@ -78,6 +79,18 @@ namespace WebAPI.Controller
                 _logger.Information($"The Vehicle successfully created for the User {user.Email}.");
             }
 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            vehiclemodel.Quantity = _uow.VehicleRepository.GetAll().Where(x => x.ModelId == vehiclemodel.Id).Count();
+
+            try
+            {
+                await _uow.VehicleModelRepository.UpdateAsync(vehiclemodel);
+                _logger.Information($"The Vehicle Model successfully updated.");
+            }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
@@ -191,6 +204,7 @@ namespace WebAPI.Controller
         public async Task<IActionResult> DeleteVehicleAsync(string? Id)
         {
             var vehicle = await _uow.VehicleRepository.GetByIdAsync(Id);
+            var vehiclemodel = await _uow.VehicleModelRepository.GetByIdAsync(vehicle.ModelId);
 
             if (vehicle == null)
             {
@@ -202,7 +216,7 @@ namespace WebAPI.Controller
             {
                 await _uow.VehicleRepository.DeleteAsync(Id);
                 _logger.Information("Vehicle is successfully deleted.");
-                return Ok("Vehicle successfully deleted.");
+                
             }
             catch (Exception ex)
             {
@@ -210,6 +224,19 @@ namespace WebAPI.Controller
                 throw new Exception(ex.Message);
 
 
+            }
+
+            vehiclemodel.Quantity = _uow.VehicleRepository.GetAll().Where(x => x.ModelId == vehiclemodel.Id).Count();
+
+            try
+            {
+                await _uow.VehicleModelRepository.UpdateAsync(vehiclemodel);
+                _logger.Information($"The Vehicle Model successfully updated.");
+                return Ok("Vehicle successfully deleted and the Quantity of the model successfully updated.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
