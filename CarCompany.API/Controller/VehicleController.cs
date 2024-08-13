@@ -45,7 +45,7 @@ namespace WebAPI.Controller
             _logger.Information("The Current User is retrieving.");
             if (user == null)
             {
-                _logger.Warning("The Current User could nto be found in the system.");
+                _logger.Warning("The Current User could not be found in the system.");
                 return NotFound(new ApiException(404, "The Current User could not be found in the system."));
             }
             var validationerrorlist = EntityValidator.GetValidationResults(_mapper.Map<Vehicles>(dto));

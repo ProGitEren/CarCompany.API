@@ -13,7 +13,7 @@ namespace Infrastucture.DTO.Dto_Vehicles
     {
         public string UserName { get; set; }
         public decimal Averagefuelin { get; set; }
-        public decimal Averagefuelout { get; set; }
+        public decimal Averagefuelout { get; set; }             
         public int COemmission { get; set; }
         public int FuelCapacity { get; set; }
         public int MaxAllowedWeight { get; set; }
