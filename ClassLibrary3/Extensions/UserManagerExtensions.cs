@@ -1,6 +1,10 @@
-﻿using ClassLibrary2.Entities;
+﻿using AutoMapper;
+using ClassLibrary2.Entities;
 using Infrastucture.DTO;
+using Infrastucture.DTO.Dto_Users;
+using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.Errors;
+using Infrastucture.Params;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -106,7 +110,6 @@ namespace Infrastucture.Extensions
 
 
             var users = await userManager.Users.ToListAsync();
-
             foreach (var user in users)
             {
                 var verificationResult = passwordhasher.VerifyHashedPassword(user, user.PasswordHash, password);
@@ -119,6 +122,58 @@ namespace Infrastucture.Extensions
 
             logger.Information("Password is unique, CorrelationId: {CorrelationId}", correlationId);
             return true;
+        }
+
+        public static async Task<ParamsUserDto> GetAllAsync(this UserManager<AppUsers> userManager,UserParams userParams, IMapper mapper)
+        {
+            var result = new ParamsUserDto();
+            var query = userManager.Users
+                .Include(x => x.Address)
+                .Include(x => x.Vehicles)
+                .AsNoTracking();
+
+
+            //search by Name
+            if (!string.IsNullOrEmpty(userParams.Search))
+                query = query.Where(x =>
+                string.Concat(x.FirstName,x.LastName).ToLower().Contains(userParams.Search) ||
+                x.Phone.Contains(userParams.Search)
+                );
+
+            //filtering 
+
+            if (!string.IsNullOrEmpty(userParams.Email))
+                query = query.Where(x => x.Email == userParams.Email);
+            if (!string.IsNullOrEmpty(userParams.Phone))
+                query = query.Where(x => x.Phone == userParams.Phone);
+            if (userParams.AddressId.HasValue)
+                query = query.Where(x => x.AddressId == userParams.AddressId.Value);
+            if (!string.IsNullOrEmpty(userParams.VehicleId))
+                query = query.Where(x => x.Vehicles.Any(x =>x.Vin == userParams.VehicleId));
+
+
+
+            //sorting
+            if (!string.IsNullOrEmpty(userParams.Sorting))
+            {
+                query = userParams.Sorting switch
+                {
+                    "PhoneAsc" => query.OrderBy(x => int.Parse(x.Phone)),
+                    "PhoneDesc" => query.OrderByDescending(x => int.Parse(x.Phone)),
+                    "VehicleCountAsc" => query.OrderBy(x => x.Vehicles.Count()),
+                    "VehicleCountDesc" => query.OrderByDescending(x => x.Vehicles.Count()),
+                    _ => query.OrderBy(x => string.Concat(x.FirstName,x.LastName))
+                };
+            }
+
+            //paging
+            result.TotalItems = query.Count();
+            query = query.Skip((userParams.Pagesize) * (userParams.PageNumber - 1)).Take(userParams.Pagesize);
+
+            var list = await query.ToListAsync(); // the execution will be done at the end
+            result.UserDtos = mapper.Map<List<UserwithdetailsDto>>(list);
+            result.PageItemCount = list.Count;
+            return result;
         }
 
     }

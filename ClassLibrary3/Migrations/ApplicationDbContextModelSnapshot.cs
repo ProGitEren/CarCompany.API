@@ -659,6 +659,10 @@ namespace Infrastucture.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("ModelPicture")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ModelShortName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -666,6 +670,9 @@ namespace Infrastucture.Migrations
 
                     b.Property<int>("ModelYear")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
@@ -691,8 +698,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "L",
                             Manufacturer = "TM",
                             ModelLongName = "Toyota Camry",
+                            ModelPicture = "/images/vehiclemodels/Toyota_Camry.png",
                             ModelShortName = "Camry",
                             ModelYear = 2020,
+                            Price = 15000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -706,8 +715,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "M",
                             Manufacturer = "FD",
                             ModelLongName = "Ford Mustang",
+                            ModelPicture = "/images/vehiclemodels/Ford_Mustang.png",
                             ModelShortName = "Mustang",
                             ModelYear = 2021,
+                            Price = 50000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -721,8 +732,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "K",
                             Manufacturer = "BM",
                             ModelLongName = "BMW X5",
+                            ModelPicture = "/images/vehiclemodels/Bmw_X5.png",
                             ModelShortName = "X5",
                             ModelYear = 2019,
+                            Price = 35000m,
                             Quantity = 0,
                             VehicleType = "SUV"
                         },
@@ -736,8 +749,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "J",
                             Manufacturer = "HN",
                             ModelLongName = "Honda Civic",
+                            ModelPicture = "/images/vehiclemodels/Honda_Civic.png",
                             ModelShortName = "Civic",
                             ModelYear = 2018,
+                            Price = 20000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -751,8 +766,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "H",
                             Manufacturer = "NS",
                             ModelLongName = "Nissan Altima",
+                            ModelPicture = "/images/vehiclemodels/Nissan_Altima.png",
                             ModelShortName = "Altima",
                             ModelYear = 2017,
+                            Price = 17500m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         });
@@ -781,6 +798,10 @@ namespace Infrastucture.Migrations
                     b.Property<int>("EngineId")
                         .HasColumnType("int");
 
+                    b.Property<string>("EngineName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FuelCapacity")
                         .HasColumnType("int");
 
@@ -792,6 +813,10 @@ namespace Infrastucture.Migrations
 
                     b.Property<int>("ModelId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");

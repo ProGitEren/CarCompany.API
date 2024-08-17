@@ -31,6 +31,11 @@ namespace Infrastucture.Services
 
             foreach (var property in properties)
             {
+                if (property.Name == nameof(vehicleModel.ModelPicture)
+                    || property.Name == nameof(vehicleModel.ModelLongName)
+                    || property.Name == nameof(vehicleModel.ModelShortName))
+                    continue;
+
                 var value = (string)property.GetValue(vehicleModel);
                 if (!string.IsNullOrEmpty(value))
                 {

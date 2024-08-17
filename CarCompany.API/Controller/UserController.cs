@@ -26,6 +26,9 @@ using System.Net;
 using Infrastucture.DTO.Dto_Users;
 using Infrastucture.DTO.Dto_Address;
 using Infrastucture.DTO.Dto_Vehicles;
+using Infrastucture.DTO.Dto_Engines;
+using Infrastucture.Helpers;
+using Infrastucture.Params;
 
 
 
@@ -689,6 +692,18 @@ namespace CarCompany.API.Controller
             _logger.Warning("No users found, CorrelationId: {CorrelationId}", correlationId);
             return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
         }
+
+        [HttpGet("get-users")]
+        [Authorize]
+
+        public async Task<IActionResult> GetAllPaginated([FromQuery] UserParams userParams)
+        {
+            var src = await _usermanager.GetAllAsync(userParams,_mapper);
+            var users = src.UserDtos.ToList() as IReadOnlyList<UserwithdetailsDto>;
+
+            return Ok(new Pagination<UserwithdetailsDto>(userParams.Pagesize, userParams.PageNumber,src.PageItemCount, src.TotalItems, users));
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpGet("get-all-users-with-Detail")]

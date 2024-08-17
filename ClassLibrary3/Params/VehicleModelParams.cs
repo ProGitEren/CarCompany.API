@@ -1,5 +1,4 @@
-﻿using Models.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.Params
 {
-    public class VehicleParams
+    public class VehiclemodelParams
     {
         //Page size
         public int maxpagesize { get; set; } = 50;
-
+        
         private int pagesize = 13;
         public int Pagesize
         {
@@ -21,11 +20,15 @@ namespace Infrastucture.Params
         public int PageNumber { get; set; } = 1;
 
         //Filter By Model
-        public string? VehicleId { get; set; } 
         public int? ModelId { get; set; }
-        public int? EngineId { get; set; }
-        public string? UserId { get; set; } 
-        public string? Role { get; set; }
+        public int? StartingModelYear { get; set; }
+        public int? EndingModelYear { get; set; }
+
+        public string? VehicleType { get; set; }
+
+        //public string? ManufacturerName { get; set; }
+
+
         //Sorting
         public string? Sorting { get; set; }
         //search 
@@ -41,6 +44,8 @@ namespace Infrastucture.Params
                 else { _search = value; }
             }
         }
+
+
 
     }
 }

@@ -37,7 +37,7 @@ namespace Infrastucture.Data.Config
             builder.Property(x => x.ModelLongName).HasMaxLength(100);
             builder.Property(x => x.ModelShortName).HasMaxLength(20);
             builder.Property(x => x.VehicleType).HasConversion(o => o.ToString(), o => (VehicleType)Enum.Parse(typeof(VehicleType), o.ToString()) );
-            builder.Property(x => x.Price).IsRequired().HasColumnType("decimal(18,4)");
+            builder.Property(x => x.Price).IsRequired().HasColumnType("decimal(18,2)");
             builder.Property(x => x.ModelPicture).IsRequired();
 
 

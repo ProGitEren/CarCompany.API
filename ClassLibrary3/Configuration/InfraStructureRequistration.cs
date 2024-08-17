@@ -32,6 +32,8 @@ namespace Infrastucture.Configuration
 
             services.AddScoped<IVinGenerationService, VinGenerationService>();
 
+            services.AddScoped<IFileService, FileService>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<ITokenServices, TokenServices>();

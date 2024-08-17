@@ -26,8 +26,6 @@ namespace Infrastucture.Repository
             await _context.SaveChangesAsync();
         }
 
-       
-
         public IEnumerable<T> GetAll()
 
          => _context.Set<T>().AsNoTracking().ToList();

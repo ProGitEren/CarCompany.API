@@ -20,6 +20,8 @@ namespace Infrastucture.DTO.Dto_VehicleModels
         public string Manufacturer { get; set; } //2 letter
         public string ManufacturedPlant { get; set; }// 1 letter
         public string CheckDigit { get; set; }
-        public IFormFile ModelPicture { get; set; }
+        public IFormFile? ModelPicture { get; set; }
+        public decimal Price { get; set; }
+
     }
 }

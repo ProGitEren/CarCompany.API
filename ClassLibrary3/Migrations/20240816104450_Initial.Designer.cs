@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240813101619_AssemblyChange_QuantityDefaultValeuChange")]
-    partial class AssemblyChange_QuantityDefaultValeuChange
+    [Migration("20240816104450_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -293,8 +293,13 @@ namespace Infrastucture.Migrations
                     b.Property<int>("CompressionRatio")
                         .HasColumnType("int");
 
+                    b.Property<string>("Cylinder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EngineCode")
                         .IsRequired()
+                        .HasMaxLength(5)
                         .HasColumnType("nchar(5)");
 
                     b.Property<string>("EngineName")
@@ -322,6 +327,7 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1000,
                             CompressionRatio = 10,
+                            Cylinder = "i4",
                             EngineCode = "EN123",
                             EngineName = "Standard 2.0L Inline 4 Engine",
                             Hp = 150,
@@ -333,6 +339,7 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1001,
                             CompressionRatio = 11,
+                            Cylinder = "v6",
                             EngineCode = "EN456",
                             EngineName = "High Output 3.5L V6 Engine",
                             Hp = 250,
@@ -344,6 +351,7 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1002,
                             CompressionRatio = 12,
+                            Cylinder = "v8",
                             EngineCode = "EN789",
                             EngineName = "Performance 4.0L V8 Engine",
                             Hp = 300,
@@ -355,6 +363,7 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1003,
                             CompressionRatio = 9,
+                            Cylinder = "i4",
                             EngineCode = "EN101",
                             EngineName = "Economy 1.6L Inline 4 Engine",
                             Hp = 120,
@@ -366,8 +375,9 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1004,
                             CompressionRatio = 10,
+                            Cylinder = "i4",
                             EngineCode = "EN202",
-                            EngineName = "Economy 2.0L Inline 4 Engine",
+                            EngineName = "Unknown Engine",
                             Hp = 200,
                             Torque = 250,
                             Volume = 2.5m,
@@ -377,7 +387,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1005,
                             CompressionRatio = 12,
-                            EngineCode = "F1V8",
+                            Cylinder = "v8",
+                            EngineCode = "F01V8",
                             EngineName = "Ford V8 Engine",
                             Hp = 450,
                             Torque = 500,
@@ -388,7 +399,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1006,
                             CompressionRatio = 0,
-                            EngineCode = "F2EM",
+                            Cylinder = "i4",
+                            EngineCode = "F02EM",
                             EngineName = "Ford Electric Motor",
                             Hp = 200,
                             Torque = 300,
@@ -399,7 +411,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1007,
                             CompressionRatio = 11,
-                            EngineCode = "F3HY",
+                            Cylinder = "v6",
+                            EngineCode = "F03HY",
                             EngineName = "Ford Hybrid Engine",
                             Hp = 350,
                             Torque = 450,
@@ -410,7 +423,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1008,
                             CompressionRatio = 10,
-                            EngineCode = "F4V6",
+                            Cylinder = "v6",
+                            EngineCode = "F04V6",
                             EngineName = "Ford V6 Turbo Engine",
                             Hp = 350,
                             Torque = 400,
@@ -421,7 +435,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1009,
                             CompressionRatio = 11,
-                            EngineCode = "T1V8",
+                            Cylinder = "v8",
+                            EngineCode = "T01V8",
                             EngineName = "Toyota V8 Engine",
                             Hp = 400,
                             Torque = 450,
@@ -432,7 +447,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1010,
                             CompressionRatio = 0,
-                            EngineCode = "T2EM",
+                            Cylinder = "i4",
+                            EngineCode = "T02EM",
                             EngineName = "Toyota Electric Motor",
                             Hp = 250,
                             Torque = 350,
@@ -443,7 +459,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1011,
                             CompressionRatio = 10,
-                            EngineCode = "T3HY",
+                            Cylinder = "v6",
+                            EngineCode = "T03HY",
                             EngineName = "Toyota Hybrid Engine",
                             Hp = 300,
                             Torque = 400,
@@ -454,7 +471,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1012,
                             CompressionRatio = 10,
-                            EngineCode = "T4V6",
+                            Cylinder = "v6",
+                            EngineCode = "T04V6",
                             EngineName = "Toyota V6 Turbo Engine",
                             Hp = 325,
                             Torque = 375,
@@ -465,7 +483,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1013,
                             CompressionRatio = 12,
-                            EngineCode = "B1V8",
+                            Cylinder = "v8",
+                            EngineCode = "B01V8",
                             EngineName = "BMW V8 Engine",
                             Hp = 450,
                             Torque = 500,
@@ -476,7 +495,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1014,
                             CompressionRatio = 0,
-                            EngineCode = "B2EM",
+                            Cylinder = "i4",
+                            EngineCode = "B02EM",
                             EngineName = "BMW Electric Motor",
                             Hp = 250,
                             Torque = 350,
@@ -487,7 +507,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1015,
                             CompressionRatio = 11,
-                            EngineCode = "B3HY",
+                            Cylinder = "v6",
+                            EngineCode = "B03HY",
                             EngineName = "BMW Hybrid Engine",
                             Hp = 300,
                             Torque = 400,
@@ -498,7 +519,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1016,
                             CompressionRatio = 10,
-                            EngineCode = "B4V6",
+                            Cylinder = "v6",
+                            EngineCode = "B04V6",
                             EngineName = "BMW V6 Turbo Engine",
                             Hp = 325,
                             Torque = 375,
@@ -509,7 +531,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1017,
                             CompressionRatio = 12,
-                            EngineCode = "H1V8",
+                            Cylinder = "v8",
+                            EngineCode = "H01V8",
                             EngineName = "Honda V8 Engine",
                             Hp = 450,
                             Torque = 500,
@@ -520,7 +543,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1018,
                             CompressionRatio = 0,
-                            EngineCode = "H2EM",
+                            Cylinder = "i4",
+                            EngineCode = "H02EM",
                             EngineName = "Honda Electric Motor",
                             Hp = 250,
                             Torque = 350,
@@ -531,7 +555,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1019,
                             CompressionRatio = 11,
-                            EngineCode = "H3HY",
+                            Cylinder = "v6",
+                            EngineCode = "H03HY",
                             EngineName = "Honda Hybrid Engine",
                             Hp = 300,
                             Torque = 400,
@@ -542,7 +567,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1020,
                             CompressionRatio = 10,
-                            EngineCode = "H4V6",
+                            Cylinder = "v6",
+                            EngineCode = "H04V6",
                             EngineName = "Honda V6 Turbo Engine",
                             Hp = 325,
                             Torque = 375,
@@ -553,7 +579,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1021,
                             CompressionRatio = 12,
-                            EngineCode = "M1V8",
+                            Cylinder = "v8",
+                            EngineCode = "M01V8",
                             EngineName = "Mercedes V8 Engine",
                             Hp = 450,
                             Torque = 500,
@@ -564,7 +591,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1022,
                             CompressionRatio = 0,
-                            EngineCode = "M2EM",
+                            Cylinder = "i4",
+                            EngineCode = "M02EM",
                             EngineName = "Mercedes Electric Motor",
                             Hp = 250,
                             Torque = 350,
@@ -575,7 +603,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1023,
                             CompressionRatio = 11,
-                            EngineCode = "M3HY",
+                            Cylinder = "v6",
+                            EngineCode = "M03HY",
                             EngineName = "Mercedes Hybrid Engine",
                             Hp = 300,
                             Torque = 400,
@@ -586,7 +615,8 @@ namespace Infrastucture.Migrations
                         {
                             Id = 1024,
                             CompressionRatio = 10,
-                            EngineCode = "M4V6",
+                            Cylinder = "v6",
+                            EngineCode = "M04V6",
                             EngineName = "Mercedes V6 Turbo Engine",
                             Hp = 325,
                             Torque = 375,
@@ -609,6 +639,7 @@ namespace Infrastucture.Migrations
 
                     b.Property<string>("EngineCode")
                         .IsRequired()
+                        .HasMaxLength(5)
                         .HasColumnType("nchar(5)");
 
                     b.Property<int>("ManufacturedCountry")
@@ -631,6 +662,10 @@ namespace Infrastucture.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("ModelPicture")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ModelShortName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -638,6 +673,9 @@ namespace Infrastucture.Migrations
 
                     b.Property<int>("ModelYear")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
@@ -663,8 +701,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "L",
                             Manufacturer = "TM",
                             ModelLongName = "Toyota Camry",
+                            ModelPicture = "/images/vehiclemodels/Toyota_Camry.png",
                             ModelShortName = "Camry",
                             ModelYear = 2020,
+                            Price = 15000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -678,8 +718,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "M",
                             Manufacturer = "FD",
                             ModelLongName = "Ford Mustang",
+                            ModelPicture = "/images/vehiclemodels/Ford_Mustang.png",
                             ModelShortName = "Mustang",
                             ModelYear = 2021,
+                            Price = 50000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -693,8 +735,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "K",
                             Manufacturer = "BM",
                             ModelLongName = "BMW X5",
+                            ModelPicture = "/images/vehiclemodels/Bmw_X5.png",
                             ModelShortName = "X5",
                             ModelYear = 2019,
+                            Price = 35000m,
                             Quantity = 0,
                             VehicleType = "SUV"
                         },
@@ -708,8 +752,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "J",
                             Manufacturer = "HN",
                             ModelLongName = "Honda Civic",
+                            ModelPicture = "/images/vehiclemodels/Honda_Civic.png",
                             ModelShortName = "Civic",
                             ModelYear = 2018,
+                            Price = 20000m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         },
@@ -723,8 +769,10 @@ namespace Infrastucture.Migrations
                             ManufacturedYear = "H",
                             Manufacturer = "NS",
                             ModelLongName = "Nissan Altima",
+                            ModelPicture = "/images/vehiclemodels/Nissan_Altima.png",
                             ModelShortName = "Altima",
                             ModelYear = 2017,
+                            Price = 17500m,
                             Quantity = 0,
                             VehicleType = "Automobile"
                         });
@@ -753,6 +801,10 @@ namespace Infrastucture.Migrations
                     b.Property<int>("EngineId")
                         .HasColumnType("int");
 
+                    b.Property<string>("EngineName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FuelCapacity")
                         .HasColumnType("int");
 
@@ -764,6 +816,10 @@ namespace Infrastucture.Migrations
 
                     b.Property<int>("ModelId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");

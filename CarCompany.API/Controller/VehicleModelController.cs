@@ -4,8 +4,10 @@ using Infrastucture.DTO.Dto_Users;
 using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.DTO.Dto_Vehicles;
 using Infrastucture.Errors;
+using Infrastucture.Helpers;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
+using Infrastucture.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -45,7 +47,7 @@ namespace WebAPI.Controller
             _logger.Information("The Current User is retrieving.");
             if (models == null)
             {
-                _logger.Warning("The Current User could nto be found in the system.");
+                _logger.Warning("The Current User could not be found in the system.");
                 return NotFound(new ApiException(404, "There is no model in the system."));
             }
 
@@ -54,45 +56,50 @@ namespace WebAPI.Controller
 
         }
 
+        [HttpGet("get-models")]
+        [Authorize]
+
+        public async Task<IActionResult> GetAllPaginated([FromQuery] VehiclemodelParams modelParams)
+        {
+            var src =  await _uow.VehicleModelRepository.GetAllAsync(modelParams);
+            var models = src.VehicleModelDtos.ToList() as IReadOnlyList<VehicleModelDto>;
+
+            return Ok(new Pagination<VehicleModelDto>(modelParams.Pagesize, modelParams.PageNumber, src.PageItemCount, src.TotalItems, models));
+        }
+
+
 
         [HttpPost("create-model")]
         [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> CreateAsync(RegisterVehicleModelDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] RegisterVehicleModelDto dto)
         {
-            var vehiclemodel = _mapper.Map<VehicleModels>(dto);
-            vehiclemodel.ManufacturedYear = VinYearMapper.GetManufacturedYearCode(vehiclemodel.ModelYear).ToString();
-            
-           
-
-            var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
-
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
             try
             {
-                await _uow.VehicleModelRepository.AddAsync(vehiclemodel);
+                var vehiclemodel = await _uow.VehicleModelRepository.AddAsync(dto);
                 _logger.Information($"The Model succesfully created.");
+                var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
+
+                if (validationerrorlist.Any())
+                {
+                    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+                }
+                var modeldto = _mapper.Map<VehicleModelDto>(vehiclemodel);
+                return Ok(modeldto);
+
             }
 
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-
-            var modeldto = _mapper.Map<VehicleModelDto>(vehiclemodel);
-            return Ok(modeldto);
-
         }
 
 
         [HttpGet("get-model/{Id}")]
         [Authorize(Roles ="Admin")]
 
-        public async Task<IActionResult> GetModelsAsync(int? Id)
+        public async Task<IActionResult> GetModelAsync(int? Id)
         {
             var model = await _uow.VehicleModelRepository.GetByIdAsync(Id);
             _logger.Information("Model is being retrieved.");
@@ -112,31 +119,27 @@ namespace WebAPI.Controller
         [HttpPut("update-model")]
         [Authorize(Roles ="Admin")]
 
-        public async Task<IActionResult> UpdateVehicleModelAsync(VehicleModelDto dto)
+        public async Task<IActionResult> UpdateVehicleModelAsync([FromForm] UpdateVehicleModelDto dto)
         {
 
-            var vehiclemodel = await _uow.VehicleModelRepository.GetByIdAsync(dto.Id);
-            _logger.Information("Model is being retrieved.");
-            if (vehiclemodel == null)
-            {
-                _logger.Warning("This model could not be found in the system.");
-                return NotFound(new ApiException(404, "This model did not found in the system."));
-            }
-
-            _mapper.Map(dto, vehiclemodel);
-            vehiclemodel.ManufacturedYear = VinYearMapper.GetManufacturedYearCode(dto.ModelYear).ToString();
+            
            
-
-            var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
-
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
             try
             {
-                await _uow.VehicleModelRepository.UpdateAsync(vehiclemodel);
+                var vehiclemodel = await _uow.VehicleModelRepository.UpdateAsync(dto);
+
+                if (vehiclemodel == null)
+                {
+                    _logger.Warning("This model could not be found in the system.");
+                    return NotFound(new ApiException(404, "This model did not found in the system."));
+                }
+
+                var validationerrorlist = EntityValidator.GetValidationResults(vehiclemodel);
+                if (validationerrorlist.Any())
+                {
+                    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+                }
+
                 _logger.Information("Vehicle is successfully updated.");
                 var modeldto = _mapper.Map<VehicleModelDto>(vehiclemodel);
 
@@ -165,9 +168,12 @@ namespace WebAPI.Controller
             
             try
             {
-                await _uow.VehicleModelRepository.DeleteAsync(Id);
-                _logger.Information("Model is successfully deleted.");
-                return Ok("Model successfully deleted.");
+                if(await _uow.VehicleModelRepository.DeleteAsync(Id))
+                {
+                    _logger.Information("Model is successfully deleted.");
+                    return Ok("Model successfully deleted.");
+                }
+                return BadRequest(new ApiException(404,"The delete action failed."));
             }
             catch (Exception ex)
             {

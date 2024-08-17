@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
 using Infrastucture.DTO.Dto_Users;
+using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.DTO.Dto_Vehicles;
 using Infrastucture.Errors;
 using Infrastucture.Extensions;
+using Infrastucture.Helpers;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
+using Infrastucture.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -62,7 +65,9 @@ namespace WebAPI.Controller
 
 
             vehicle.ModelId = vehiclemodel.Id;
+            vehicle.ModelName = vehiclemodel.ModelShortName;
             vehicle.EngineId = engine.Id;
+            vehicle.EngineName = engine.EngineName;
             vehicle.Vin = _vingenerationservice.GenerateVin(vehiclemodel);
             if (User.IsInRole("Admin"))
             {
@@ -122,6 +127,17 @@ namespace WebAPI.Controller
         }
 
         [HttpGet("get-vehicles")]
+        [Authorize]
+
+        public async Task<IActionResult> GetAllPaginated([FromQuery] VehicleParams vehicleParams)
+        {
+            var src = await _uow.VehicleRepository.GetAllAsync(vehicleParams);
+            var vehicles = src.VehicleDtos.ToList() as IReadOnlyList<VehicleDto>;
+
+            return Ok(new Pagination<VehicleDto>(vehicleParams.Pagesize, vehicleParams.PageNumber,src.PageItemCount, src.TotalItems, vehicles));
+        }
+
+        [HttpGet("get-all-vehicles")]
         [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> GetAllVehiclesAsync()

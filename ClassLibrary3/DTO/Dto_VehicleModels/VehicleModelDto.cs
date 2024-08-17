@@ -25,7 +25,9 @@ namespace Infrastucture.DTO.Dto_VehicleModels
         public string ManufacturedPlant { get; set; }// 1 letter
         public string CheckDigit { get; set; }
         public int Quantity { get; set; }
-        public string ModelPicture { get; set; }
+        public string ModelPicturePath { get; set; }
+        public decimal Price { get; set; }
+
 
 
 

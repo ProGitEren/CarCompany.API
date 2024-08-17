@@ -17,8 +17,9 @@ namespace Infrastucture.Map
         {
 
             CreateMap<VehicleModels, VehicleModelDto>().
-            ForMember(d => d.ModelPicture, o => o.MapFrom<VehicleModelUrlResolver>())
+            ForMember(d => d.ModelPicturePath, o => o.MapFrom<VehicleModelUrlResolver>())
             .ReverseMap();
+
             CreateMap<UpdateVehicleModelDto, VehicleModels>().ReverseMap();
             CreateMap<RegisterVehicleModelDto, VehicleModels>().ReverseMap();
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.Params
 {
-    public class VehicleParams
+    public class EngineParams
     {
         //Page size
         public int maxpagesize { get; set; } = 50;
@@ -21,11 +21,10 @@ namespace Infrastucture.Params
         public int PageNumber { get; set; } = 1;
 
         //Filter By Model
-        public string? VehicleId { get; set; } 
-        public int? ModelId { get; set; }
-        public int? EngineId { get; set; }
-        public string? UserId { get; set; } 
-        public string? Role { get; set; }
+        public int? Id { get; set; }
+        public string? EngineCode { get; set; } 
+        public string? Cylinder { get; set; } 
+        
         //Sorting
         public string? Sorting { get; set; }
         //search 

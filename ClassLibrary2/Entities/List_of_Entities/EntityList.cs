@@ -329,7 +329,9 @@ namespace Models.Entities.List_of_Entities
                 ModelLongName = "Toyota Camry",
                 ModelShortName = "Camry",
                 VehicleType = VehicleType.Automobile,
-                
+                ModelPicture = "/images/vehiclemodels/Toyota_Camry.png",
+                Price = 15000
+
             },
             new VehicleModels
             {
@@ -343,7 +345,9 @@ namespace Models.Entities.List_of_Entities
                 Manufacturer = "FD",
                 ModelLongName = "Ford Mustang",
                 ModelShortName = "Mustang",
-                VehicleType = VehicleType.Automobile
+                VehicleType = VehicleType.Automobile,
+                ModelPicture = "/images/vehiclemodels/Ford_Mustang.png",
+                Price = 50000
             },
             new VehicleModels
             {
@@ -357,7 +361,9 @@ namespace Models.Entities.List_of_Entities
                 Manufacturer = "BM",
                 ModelLongName = "BMW X5",
                 ModelShortName = "X5",
-                VehicleType = VehicleType.SUV
+                VehicleType = VehicleType.SUV,
+                ModelPicture = "/images/vehiclemodels/Bmw_X5.png",
+                Price = 35000
             },
             new VehicleModels
             {
@@ -371,7 +377,9 @@ namespace Models.Entities.List_of_Entities
                 Manufacturer = "HN",
                 ModelLongName = "Honda Civic",
                 ModelShortName = "Civic",
-                VehicleType = VehicleType.Automobile
+                VehicleType = VehicleType.Automobile,
+                ModelPicture = "/images/vehiclemodels/Honda_Civic.png",
+                Price = 20000
             },
             new VehicleModels
             {
@@ -385,7 +393,9 @@ namespace Models.Entities.List_of_Entities
                 Manufacturer = "NS",
                 ModelLongName = "Nissan Altima",
                 ModelShortName = "Altima",
-                VehicleType = VehicleType.Automobile
+                VehicleType = VehicleType.Automobile,
+                ModelPicture = "/images/vehiclemodels/Nissan_Altima.png",
+                Price = 17500
             }
         };
     }

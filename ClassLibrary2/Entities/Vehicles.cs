@@ -16,6 +16,10 @@ namespace Models.Entities
         
         public string Vin { get; set; }
 
+        public string ModelName { get; set; }
+
+        public string EngineName { get; set; }
+
         public string UserName { get; set; }
 
         public decimal Averagefuelin { get; set; }
@@ -43,8 +47,6 @@ namespace Models.Entities
         [NotMapped]
 
         public string ModelCode { get; set; }
-
-
 
         // Navigatipnal Property
 

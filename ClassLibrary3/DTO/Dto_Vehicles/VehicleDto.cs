@@ -11,6 +11,8 @@ namespace Infrastucture.DTO.Dto_Vehicles
     {
 
         public string Vin { get; set; }
+        public string ModelName { get; set; }
+        public string EngineName { get; set; }
         public string UserName { get; set; }
         public decimal Averagefuelin { get; set; }
         public decimal Averagefuelout { get; set; }
@@ -22,6 +24,7 @@ namespace Infrastucture.DTO.Dto_Vehicles
         public int DrivenKM { get; set; }
         public int ModelId { get; set; }
         public int EngineId { get; set; }
+        public string? UserId { get; set; }
 
     }
 }

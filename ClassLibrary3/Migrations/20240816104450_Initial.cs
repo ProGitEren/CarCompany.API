@@ -49,12 +49,14 @@ namespace Infrastucture.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1000, 1"),
+                    Cylinder = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EngineName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Volume = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     Hp = table.Column<int>(type: "int", nullable: false),
                     CompressionRatio = table.Column<int>(type: "int", nullable: false),
                     Torque = table.Column<int>(type: "int", nullable: false),
                     diameterCm = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    EngineCode = table.Column<string>(type: "nchar(5)", nullable: false)
+                    EngineCode = table.Column<string>(type: "nchar(5)", maxLength: 5, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,11 +70,13 @@ namespace Infrastucture.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1000, 1"),
                     VehicleType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EngineCode = table.Column<string>(type: "nchar(5)", nullable: false),
+                    EngineCode = table.Column<string>(type: "nchar(5)", maxLength: 5, nullable: false),
                     ModelShortName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     ModelLongName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     ModelYear = table.Column<int>(type: "int", nullable: false),
+                    ModelPicture = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ManufacturedCountry = table.Column<int>(type: "int", nullable: false),
                     Manufacturer = table.Column<string>(type: "nchar(2)", nullable: false),
                     ManufacturedYear = table.Column<string>(type: "nchar(1)", nullable: false),
@@ -232,6 +236,8 @@ namespace Infrastucture.Migrations
                 columns: table => new
                 {
                     Vin = table.Column<string>(type: "nchar(17)", nullable: false),
+                    ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EngineName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
                     Averagefuelin = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     Averagefuelout = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
@@ -264,51 +270,52 @@ namespace Infrastucture.Migrations
                         name: "FK_Vehicles_VehicleModels_ModelId",
                         column: x => x.ModelId,
                         principalTable: "VehicleModels",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Engines",
-                columns: new[] { "Id", "CompressionRatio", "EngineCode", "Hp", "Torque", "Volume", "diameterCm" },
+                columns: new[] { "Id", "CompressionRatio", "Cylinder", "EngineCode", "EngineName", "Hp", "Torque", "Volume", "diameterCm" },
                 values: new object[,]
                 {
-                    { 1000, 10, "EN123", 150, 200, 2.0m, 8.5m },
-                    { 1001, 11, "EN456", 250, 350, 3.5m, 10.0m },
-                    { 1002, 12, "EN789", 300, 400, 4.0m, 11.0m },
-                    { 1003, 9, "EN101", 120, 180, 1.6m, 7.5m },
-                    { 1004, 10, "EN202", 200, 250, 2.5m, 9.0m },
-                    { 1005, 12, "F1V8", 450, 500, 5.0m, 12.0m },
-                    { 1006, 0, "F2EM", 200, 300, 0.0m, 0.0m },
-                    { 1007, 11, "F3HY", 350, 450, 2.5m, 9.5m },
-                    { 1008, 10, "F4V6", 350, 400, 3.0m, 10.5m },
-                    { 1009, 11, "T1V8", 400, 450, 4.5m, 11.5m },
-                    { 1010, 0, "T2EM", 250, 350, 0.0m, 0.0m },
-                    { 1011, 10, "T3HY", 300, 400, 2.5m, 9.5m },
-                    { 1012, 10, "T4V6", 325, 375, 3.0m, 10.5m },
-                    { 1013, 12, "B1V8", 450, 500, 4.5m, 12.0m },
-                    { 1014, 0, "B2EM", 250, 350, 0.0m, 0.0m },
-                    { 1015, 11, "B3HY", 300, 400, 2.5m, 9.5m },
-                    { 1016, 10, "B4V6", 325, 375, 3.0m, 10.5m },
-                    { 1017, 12, "H1V8", 450, 500, 4.5m, 12.0m },
-                    { 1018, 0, "H2EM", 250, 350, 0.0m, 0.0m },
-                    { 1019, 11, "H3HY", 300, 400, 2.5m, 9.5m },
-                    { 1020, 10, "H4V6", 325, 375, 3.0m, 10.5m },
-                    { 1021, 12, "M1V8", 450, 500, 4.5m, 12.0m },
-                    { 1022, 0, "M2EM", 250, 350, 0.0m, 0.0m },
-                    { 1023, 11, "M3HY", 300, 400, 2.5m, 9.5m },
-                    { 1024, 10, "M4V6", 325, 375, 3.0m, 10.5m }
+                    { 1000, 10, "i4", "EN123", "Standard 2.0L Inline 4 Engine", 150, 200, 2.0m, 8.5m },
+                    { 1001, 11, "v6", "EN456", "High Output 3.5L V6 Engine", 250, 350, 3.5m, 10.0m },
+                    { 1002, 12, "v8", "EN789", "Performance 4.0L V8 Engine", 300, 400, 4.0m, 11.0m },
+                    { 1003, 9, "i4", "EN101", "Economy 1.6L Inline 4 Engine", 120, 180, 1.6m, 7.5m },
+                    { 1004, 10, "i4", "EN202", "Unknown Engine", 200, 250, 2.5m, 9.0m },
+                    { 1005, 12, "v8", "F01V8", "Ford V8 Engine", 450, 500, 5.0m, 12.0m },
+                    { 1006, 0, "i4", "F02EM", "Ford Electric Motor", 200, 300, 0.0m, 0.0m },
+                    { 1007, 11, "v6", "F03HY", "Ford Hybrid Engine", 350, 450, 2.5m, 9.5m },
+                    { 1008, 10, "v6", "F04V6", "Ford V6 Turbo Engine", 350, 400, 3.0m, 10.5m },
+                    { 1009, 11, "v8", "T01V8", "Toyota V8 Engine", 400, 450, 4.5m, 11.5m },
+                    { 1010, 0, "i4", "T02EM", "Toyota Electric Motor", 250, 350, 0.0m, 0.0m },
+                    { 1011, 10, "v6", "T03HY", "Toyota Hybrid Engine", 300, 400, 2.5m, 9.5m },
+                    { 1012, 10, "v6", "T04V6", "Toyota V6 Turbo Engine", 325, 375, 3.0m, 10.5m },
+                    { 1013, 12, "v8", "B01V8", "BMW V8 Engine", 450, 500, 4.5m, 12.0m },
+                    { 1014, 0, "i4", "B02EM", "BMW Electric Motor", 250, 350, 0.0m, 0.0m },
+                    { 1015, 11, "v6", "B03HY", "BMW Hybrid Engine", 300, 400, 2.5m, 9.5m },
+                    { 1016, 10, "v6", "B04V6", "BMW V6 Turbo Engine", 325, 375, 3.0m, 10.5m },
+                    { 1017, 12, "v8", "H01V8", "Honda V8 Engine", 450, 500, 4.5m, 12.0m },
+                    { 1018, 0, "i4", "H02EM", "Honda Electric Motor", 250, 350, 0.0m, 0.0m },
+                    { 1019, 11, "v6", "H03HY", "Honda Hybrid Engine", 300, 400, 2.5m, 9.5m },
+                    { 1020, 10, "v6", "H04V6", "Honda V6 Turbo Engine", 325, 375, 3.0m, 10.5m },
+                    { 1021, 12, "v8", "M01V8", "Mercedes V8 Engine", 450, 500, 4.5m, 12.0m },
+                    { 1022, 0, "i4", "M02EM", "Mercedes Electric Motor", 250, 350, 0.0m, 0.0m },
+                    { 1023, 11, "v6", "M03HY", "Mercedes Hybrid Engine", 300, 400, 2.5m, 9.5m },
+                    { 1024, 10, "v6", "M04V6", "Mercedes V6 Turbo Engine", 325, 375, 3.0m, 10.5m }
                 });
 
             migrationBuilder.InsertData(
                 table: "VehicleModels",
-                columns: new[] { "Id", "CheckDigit", "EngineCode", "ManufacturedCountry", "ManufacturedPlant", "ManufacturedYear", "Manufacturer", "ModelLongName", "ModelShortName", "ModelYear", "VehicleType" },
+                columns: new[] { "Id", "CheckDigit", "EngineCode", "ManufacturedCountry", "ManufacturedPlant", "ManufacturedYear", "Manufacturer", "ModelLongName", "ModelPicture", "ModelShortName", "ModelYear", "Price", "VehicleType" },
                 values: new object[,]
                 {
-                    { 1000, "1", "EN123", 1, "A", "L", "TM", "Toyota Camry", "Camry", 2020, "Automobile" },
-                    { 1001, "2", "EN456", 2, "B", "M", "FD", "Ford Mustang", "Mustang", 2021, "Automobile" },
-                    { 1002, "3", "EN789", 1, "C", "K", "BM", "BMW X5", "X5", 2019, "SUV" },
-                    { 1003, "4", "EN101", 1, "D", "J", "HN", "Honda Civic", "Civic", 2018, "Automobile" },
-                    { 1004, "5", "EN202", 1, "E", "H", "NS", "Nissan Altima", "Altima", 2017, "Automobile" }
+                    { 1000, "1", "EN123", 1, "A", "L", "TM", "Toyota Camry", "/images/vehiclemodels/Toyota_Camry.png", "Camry", 2020, 15000m, "Automobile" },
+                    { 1001, "2", "EN456", 2, "B", "M", "FD", "Ford Mustang", "/images/vehiclemodels/Ford_Mustang.png", "Mustang", 2021, 50000m, "Automobile" },
+                    { 1002, "3", "EN789", 1, "C", "K", "BM", "BMW X5", "/images/vehiclemodels/Bmw_X5.png", "X5", 2019, 35000m, "SUV" },
+                    { 1003, "4", "EN101", 1, "D", "J", "HN", "Honda Civic", "/images/vehiclemodels/Honda_Civic.png", "Civic", 2018, 20000m, "Automobile" },
+                    { 1004, "5", "EN202", 1, "E", "H", "NS", "Nissan Altima", "/images/vehiclemodels/Nissan_Altima.png", "Altima", 2017, 17500m, "Automobile" }
                 });
 
             migrationBuilder.CreateIndex(

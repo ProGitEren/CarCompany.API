@@ -16,10 +16,9 @@ namespace Infrastucture.Map
         {
 
 
-            CreateMap<VehicleDto, Vehicles>().ReverseMap();
+            CreateMap<VehicleDto, Vehicles>().ForMember(x=>x.VehicleModel, opt => opt.Ignore()).ReverseMap();
             CreateMap<RegisterVehicleDto, Vehicles>().ReverseMap();
 
-            CreateMap<ICollection<VehicleDto>, ICollection<Vehicles>>().ReverseMap();
 
         }
 

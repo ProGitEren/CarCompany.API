@@ -3,8 +3,10 @@ using ClassLibrary2.Entities;
 using Infrastucture.DTO.Dto_Engines;
 using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.Errors;
+using Infrastucture.Helpers;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
+using Infrastucture.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -33,8 +35,6 @@ namespace WebAPI.Controller
 
 
         [HttpGet("get-all-engines")]
-        
-
         public async Task<IActionResult> GetAll()
         {
             var engines = _uow.EngineRepository.GetAll();
@@ -49,6 +49,17 @@ namespace WebAPI.Controller
             var dtos = _mapper.Map<IEnumerable<EngineDto>>(engines);
             return Ok(dtos);
 
+        }
+
+        [HttpGet("get-engines")]
+        [Authorize]
+
+        public async Task<IActionResult> GetAllPaginated([FromQuery] EngineParams engineParams)
+        {
+            var src = await _uow.EngineRepository.GetAllAsync(engineParams);
+            var engines = src.EngineDtos.ToList() as IReadOnlyList<EngineDto>;
+
+            return Ok(new Pagination<EngineDto>(engineParams.Pagesize, engineParams.PageNumber,src.PageItemCount, src.TotalItems, engines));
         }
 
 

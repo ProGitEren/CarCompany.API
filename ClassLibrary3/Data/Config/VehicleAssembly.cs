@@ -40,7 +40,9 @@ namespace Infrastucture.Data.Config
             
             // Vehicle should have a model and engine
             builder.Property(x => x.ModelId).IsRequired();
+            builder.Property(x => x.ModelName).IsRequired();
             builder.Property(x => x.EngineId).IsRequired();
+            builder.Property(x => x.EngineName).IsRequired();
             builder.Property(x => x.UserId).IsRequired(false);
 
 
