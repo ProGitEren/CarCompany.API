@@ -35,7 +35,7 @@ namespace Models.Entities
         [Range(0, 30000)]
         public int MaxAllowedWeight { get; set; }
 
-        [Range(0, 100)]
+        [Range(0, 10000)]
         public int MinWeight { get; set; }
 
         [Range(0,1000)]

@@ -32,6 +32,8 @@ namespace Infrastucture.Repository
 
         public IEngineRepository EngineRepository { get; }
 
+        public IUserRepository UserRepository { get; }
+
         public UnitOfWork(ApplicationDbContext context, IFileProvider fileProvider, IMapper mapper,IFileService fileService)
         {
             _context = context;
@@ -43,6 +45,7 @@ namespace Infrastucture.Repository
             AddressRepository = new AddressRepository(_context);
             VehicleModelRepository = new VehicleModelRepository(_context,_fileProvider,_mapper,_fileService);
             EngineRepository = new EngineRepository(_context, _mapper);
+            UserRepository = new UserRepository(_context);
 
 
         }

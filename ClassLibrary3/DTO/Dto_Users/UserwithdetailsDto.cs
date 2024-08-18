@@ -18,13 +18,13 @@ namespace Infrastucture.DTO.Dto_Users
 
         public string LastName { get; set; }
 
+        public string Phone { get; set; }
+
         public AddressDto AddressDto { get; set; }
 
         public List<VehicleDto> VehiclesDto { get; set; }
 
         public string Token { get; set; }
-
-        public string Phone { get; set; }
 
         public IList<string> roles { get; set; }
 

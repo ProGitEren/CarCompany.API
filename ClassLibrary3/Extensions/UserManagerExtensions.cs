@@ -124,13 +124,15 @@ namespace Infrastucture.Extensions
             return true;
         }
 
-        public static async Task<ParamsUserDto> GetAllAsync(this UserManager<AppUsers> userManager,UserParams userParams, IMapper mapper)
+        public static async Task<IQueryable<AppUsers>> GetAllAsync(this UserManager<AppUsers> userManager,UserParams userParams)
         {
             var result = new ParamsUserDto();
             var query = userManager.Users
                 .Include(x => x.Address)
                 .Include(x => x.Vehicles)
                 .AsNoTracking();
+
+            
 
 
             //search by Name
@@ -151,29 +153,26 @@ namespace Infrastucture.Extensions
             if (!string.IsNullOrEmpty(userParams.VehicleId))
                 query = query.Where(x => x.Vehicles.Any(x =>x.Vin == userParams.VehicleId));
 
-
+           
 
             //sorting
             if (!string.IsNullOrEmpty(userParams.Sorting))
             {
                 query = userParams.Sorting switch
                 {
-                    "PhoneAsc" => query.OrderBy(x => int.Parse(x.Phone)),
-                    "PhoneDesc" => query.OrderByDescending(x => int.Parse(x.Phone)),
+                    "PhoneAsc" => query.OrderBy(x => x.Phone),
+                    "PhoneDesc" => query.OrderByDescending(x => x.Phone),
                     "VehicleCountAsc" => query.OrderBy(x => x.Vehicles.Count()),
                     "VehicleCountDesc" => query.OrderByDescending(x => x.Vehicles.Count()),
+                    "EmailAsc" => query.OrderBy(x => x.Email),
+                    "EmailDesc" => query.OrderByDescending(x => x.Email),
                     _ => query.OrderBy(x => string.Concat(x.FirstName,x.LastName))
                 };
             }
 
             //paging
-            result.TotalItems = query.Count();
-            query = query.Skip((userParams.Pagesize) * (userParams.PageNumber - 1)).Take(userParams.Pagesize);
 
-            var list = await query.ToListAsync(); // the execution will be done at the end
-            result.UserDtos = mapper.Map<List<UserwithdetailsDto>>(list);
-            result.PageItemCount = list.Count;
-            return result;
+            return query;
         }
 
     }

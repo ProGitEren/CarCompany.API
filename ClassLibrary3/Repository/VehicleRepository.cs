@@ -60,7 +60,10 @@ namespace Infrastucture.Repository
             if (!string.IsNullOrEmpty(vehicleParams.UserId))
                 query = query.Where(x => x.UserId == vehicleParams.UserId);
 
-            
+            if (!string.IsNullOrEmpty(vehicleParams.UserName))
+                query = query.Where(x => x.UserName == vehicleParams.UserName);
+
+
 
             if (!string.IsNullOrEmpty(vehicleParams.Role))
             {

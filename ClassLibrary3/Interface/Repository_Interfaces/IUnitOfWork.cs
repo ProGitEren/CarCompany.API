@@ -16,5 +16,7 @@ namespace Infrastucture.Interface.Repository_Interfaces
 
         public IEngineRepository EngineRepository { get; }
 
+        public IUserRepository UserRepository { get; }
+
     }
 }

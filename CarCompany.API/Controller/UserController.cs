@@ -446,7 +446,7 @@ namespace CarCompany.API.Controller
         //public async Task<IActionResult> RegisterAdminApiAsync(RegisterApiDto registerdto)
         //{
         //    var correlationId = GetCorrelationId();
-            
+
         //    _logger.Information("Registration attempt for user {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
 
         //    if (CheckEmailExist(registerdto.Email).Result.Value)
@@ -540,6 +540,18 @@ namespace CarCompany.API.Controller
         //        Errors = new[] { $"Unexpected Error Hapoened: {result.Errors}." }
         //    });
         //}
+
+        [HttpGet("get-users")]
+        [Authorize(Roles ="Admin")]
+
+        public async Task<IActionResult> GetAllPaginated([FromQuery] UserParams userParams)
+        {
+            var src = await _uow.UserRepository.GetUsersWithRoleAsync(_usermanager, userParams, _mapper);
+            var users = src.UserDtos.ToList() as IReadOnlyList<UserwithdetailsDto>;
+
+            return Ok(new Pagination<UserwithdetailsDto>(userParams.Pagesize, userParams.PageNumber, src.PageItemCount, src.TotalItems, users));
+        }
+
 
         [Authorize]
         [HttpGet("get-current-user")]
@@ -693,16 +705,6 @@ namespace CarCompany.API.Controller
             return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
         }
 
-        [HttpGet("get-users")]
-        [Authorize]
-
-        public async Task<IActionResult> GetAllPaginated([FromQuery] UserParams userParams)
-        {
-            var src = await _usermanager.GetAllAsync(userParams,_mapper);
-            var users = src.UserDtos.ToList() as IReadOnlyList<UserwithdetailsDto>;
-
-            return Ok(new Pagination<UserwithdetailsDto>(userParams.Pagesize, userParams.PageNumber,src.PageItemCount, src.TotalItems, users));
-        }
 
 
         [Authorize(Roles = "Admin")]

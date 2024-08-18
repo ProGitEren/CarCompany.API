@@ -23,9 +23,8 @@ namespace Infrastucture.Params
         public string? Email { get; set; } 
         public string? Phone { get; set; } 
         public string? VehicleId { get; set; } 
-
+        public string? Role { get; set; }
         public Guid? AddressId { get; set; } 
-
 
         //Sorting
         public string? Sorting { get; set; }

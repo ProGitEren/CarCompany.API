@@ -50,7 +50,7 @@ namespace Infrastucture.Migrations
 
                     b.HasKey("AddressId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("ClassLibrary2.Entities.AppUsers", b =>
@@ -317,7 +317,7 @@ namespace Infrastucture.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Engines");
+                    b.ToTable("Engines", (string)null);
 
                     b.HasData(
                         new
@@ -685,7 +685,7 @@ namespace Infrastucture.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VehicleModels");
+                    b.ToTable("VehicleModels", (string)null);
 
                     b.HasData(
                         new
@@ -834,7 +834,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Vehicles");
+                    b.ToTable("Vehicles", (string)null);
                 });
 
             modelBuilder.Entity("ClassLibrary2.Entities.AppUsers", b =>
