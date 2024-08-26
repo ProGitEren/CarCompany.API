@@ -4,6 +4,7 @@ using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
 using Infrastucture.Params;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Models.Entities;
@@ -42,10 +43,7 @@ namespace Infrastucture.Repository
                 try 
                 {
                     var root = "/images/vehiclemodels/";
-                    if (!Directory.Exists(root))
-                    {
-                        Directory.CreateDirectory(root);
-                    }
+                   
                     var src = _fileService.SaveFile(dto.ModelPicture, root);
                     var vehiclemodel = _mapper.Map<VehicleModels>(dto);
                     vehiclemodel.ModelPicture = src;
@@ -77,10 +75,7 @@ namespace Infrastucture.Repository
                         try
                         {
                             var root = "/images/vehiclemodels/";
-                            if (!Directory.Exists(root))
-                            {
-                                Directory.CreateDirectory(root);
-                            }
+                            
                             src = _fileService.SaveFile(dto.ModelPicture, root);
 
                             //remove old picture
@@ -206,6 +201,7 @@ namespace Infrastucture.Repository
             result.VehicleModelDtos = _mapper.Map<List<VehicleModelDto>>(list);
             result.PageItemCount = list.Count;
             return result;
+            
         }
 
     }

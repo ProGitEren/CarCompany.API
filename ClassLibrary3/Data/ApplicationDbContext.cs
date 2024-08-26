@@ -26,6 +26,8 @@ namespace Infrastucture.Data
         public DbSet<Engines> Engines { get; set; }
 
         public DbSet<VehicleModels> VehicleModels { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderVehicle> OrderVehicles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

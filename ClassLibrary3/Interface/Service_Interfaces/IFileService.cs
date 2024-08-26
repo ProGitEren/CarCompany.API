@@ -14,6 +14,14 @@ namespace Infrastucture.Interface.Service_Interfaces
         string SaveFile(IFormFile file, string folderPath);
 
         void DeleteFile(string picturePath);
+
+        string GenerateUniqueFolderName(string rootDirectory);
+
+        void DeleteFolder(string folderPath);
+
+        IEnumerable<string> GetFilesInDirectory(string folderPath);
+
+        bool CheckFileType(IFormFile file);
     }
 
 }

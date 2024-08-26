@@ -51,14 +51,16 @@ namespace WebAPI.Controller
                 _logger.Warning("The Current User could not be found in the system.");
                 return NotFound(new ApiException(404, "The Current User could not be found in the system."));
             }
-            var validationerrorlist = EntityValidator.GetValidationResults(_mapper.Map<Vehicles>(dto));
+            
+
+            var vehicle = _mapper.Map<Vehicles>(dto);
+            
+            var validationerrorlist = EntityValidator.GetValidationResults(_mapper.Map<Vehicles>(vehicle));
 
             if (validationerrorlist.Any())
             {
                 return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
             }
-
-            var vehicle = _mapper.Map<Vehicles>(dto);
             var vehiclemodel = await _uow.VehicleModelRepository.GetByIdAsync(dto.ModelId);
             var engine = _uow.EngineRepository.GetByEngineCode(vehiclemodel.EngineCode);
             

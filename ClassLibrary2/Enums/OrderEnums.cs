@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -14,7 +15,9 @@ namespace Models.Enums
             [EnumMember(Value = "Active")]
             Active,
             [EnumMember(Value = "Sold")]
-            Sold,
+            Sold, 
+            [EnumMember(Value = "Not Active")]
+            NotActive,
         }
 
         public enum PaymentMethod {
@@ -30,7 +33,7 @@ namespace Models.Enums
             [EnumMember(Value = "Rent")]
             Rent,
             [EnumMember(Value = "Buy")]
-            Buybbb,
+            Buy,
         }
     }
 }

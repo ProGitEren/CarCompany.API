@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPI.Validation;
 
 namespace Infrastucture.Repository
 {
@@ -22,8 +23,15 @@ namespace Infrastucture.Repository
 
         public async Task AddAsync(T Entity)
         {
-            await _context.Set<T>().AddAsync(Entity);
-            await _context.SaveChangesAsync();
+            var validationerrorlist = EntityValidator.GetValidationResults(Entity);
+
+            if (!validationerrorlist.Any())
+            {
+                await _context.Set<T>().AddAsync(Entity);
+                await _context.SaveChangesAsync();
+                // no database operation
+            }
+            
         }
 
         public IEnumerable<T> GetAll()
@@ -35,8 +43,15 @@ namespace Infrastucture.Repository
             
             if (Entity != null)
             {
-                _context.Update<T>(Entity);
-                await _context.SaveChangesAsync();
+                var validationerrorlist = EntityValidator.GetValidationResults(Entity);
+
+                if (!validationerrorlist.Any())
+                {
+                    _context.Update<T>(Entity);
+                    await _context.SaveChangesAsync();
+                    // no database operation
+                }
+              
             }
         }
 

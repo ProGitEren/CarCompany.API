@@ -226,7 +226,14 @@ namespace CarCompany.API.Controller
             //}
 
             var address = _mapper.Map<Address>(registerdto.Address);
-            
+
+            var validationerrorlist = EntityValidator.GetValidationResults(address);
+
+            if (validationerrorlist.Any())
+            {
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            }
+
             try
             {
                 await _uow.AddressRepository.AddAsync(address);
@@ -247,11 +254,11 @@ namespace CarCompany.API.Controller
                 AddressId = address.AddressId,
             };
 
-            var validationerrorlist = EntityValidator.GetValidationResults(user);
+            var validationerrorlist_2 = EntityValidator.GetValidationResults(user);
 
-            if (validationerrorlist.Any())
+            if (validationerrorlist_2.Any())
             {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist_2 });
             }
 
             try
