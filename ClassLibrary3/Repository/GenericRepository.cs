@@ -1,13 +1,15 @@
 ﻿using ClassLibrary2.Entities;
 using Infrastucture.Data;
+using Infrastucture.Errors;
 using Infrastucture.Interface.Repository_Interfaces;
+using Infrastucture.Validation;
+using LanguageExt.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.Validation;
 
 namespace Infrastucture.Repository
 {
@@ -31,7 +33,6 @@ namespace Infrastucture.Repository
                 await _context.SaveChangesAsync();
                 // no database operation
             }
-            
         }
 
         public IEnumerable<T> GetAll()

@@ -1,6 +1,7 @@
 ﻿using ClassLibrary2.Entities;
 using Infrastucture.DTO.Dto_Address;
 using Infrastucture.DTO.Dto_Vehicles;
+using Models.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.DTO.Dto_Users
 {
-    public class UserwithdetailsDto
+    public class UserwithdetailsDto 
     {
         public string FirstName { get; set; }
 

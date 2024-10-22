@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
+using FluentValidation;
 using Infrastucture.Data;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
+using Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,8 @@ namespace Infrastucture.Repository
         private readonly IFileService _fileService;
 
         private readonly UserManager<AppUsers> _userManager; 
+
+        
 
         public IAddressRepository AddressRepository { get; }
 

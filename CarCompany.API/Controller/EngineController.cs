@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
+using FluentValidation;
 using Infrastucture.DTO.Dto_Engines;
 using Infrastucture.DTO.Dto_VehicleModels;
 using Infrastucture.Errors;
@@ -25,12 +26,14 @@ namespace WebAPI.Controller
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _uow;
         private readonly Serilog.ILogger _logger;
+        private readonly IValidator<Engines> _validator;
 
-        public EngineController(IUnitOfWork uow, IMapper mapper, Serilog.ILogger logger)
+        public EngineController(IUnitOfWork uow, IMapper mapper, Serilog.ILogger logger, IValidator<Engines> validator)
         {
             _logger = logger;
             _uow = uow;
             _mapper = mapper;
+            _validator = validator;
         }
 
 
@@ -70,26 +73,34 @@ namespace WebAPI.Controller
         {
             var engine = _mapper.Map<Engines>(dto);
 
-            var validationerrorlist = EntityValidator.GetValidationResults(engine);
+            // Previous Implementation for validating the Entities this was related to built-in Data Annotations validator
 
-            if (validationerrorlist.Any())
+            //var validationerrorlist = EntityValidator.GetValidationResults(engine);
+
+            //if (validationerrorlist.Any())
+            //{
+            //    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+            //}
+
+            var validationResult = _validator.Validate(engine);
+            if (validationResult.IsValid)
             {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+                try
+                {
+                    await _uow.EngineRepository.AddAsync(engine);
+                    _logger.Information($"The Engine succesfully created.");
+                }
+
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+
+                var enginedto = _mapper.Map<EngineDto>(engine);
+                return Ok(enginedto);
             }
 
-            try
-            {
-                await _uow.EngineRepository.AddAsync(engine);
-                _logger.Information($"The Engine succesfully created.");
-            }
-
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            var enginedto = _mapper.Map<EngineDto>(engine);
-            return Ok(enginedto);
+            return BadRequest(new ApiValidationErrorResponse(validationResult.Errors));
 
         }
 
@@ -119,37 +130,44 @@ namespace WebAPI.Controller
 
         public async Task<IActionResult> UpdateEngineAsync(EngineDto dto)
         {
+            var engineCheck = _mapper.Map<Engines>(dto);
+            var validationResult = _validator.Validate(engineCheck);
 
-            var engine = await _uow.EngineRepository.GetByIdAsync(dto.Id);
-            _logger.Information("Engine is being retrieved.");
-            if (engine == null)
+            if (validationResult.IsValid)
             {
-                _logger.Warning("This engine could not be found in the system.");
-                return NotFound(new ApiException(404, "This engine did not found in the system."));
+
+                var engine = await _uow.EngineRepository.GetByIdAsync(dto.Id);
+                _logger.Information("Engine is being retrieved.");
+                if (engine == null)
+                {
+                    _logger.Warning("This engine could not be found in the system.");
+                    return NotFound(new ApiException(404, "This engine did not found in the system."));
+                }
+
+                _mapper.Map(dto, engine);
+
+                //var validationerrorlist = EntityValidator.GetValidationResults(engine);
+
+                //if (validationerrorlist.Any())
+                //{
+                //    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
+                //}
+
+                try
+                {
+                    await _uow.EngineRepository.UpdateAsync(engine);
+                    _logger.Information("Engine is successfully updated.");
+                    var enginedto = _mapper.Map<EngineDto>(engine);
+
+                    return Ok(enginedto);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warning("Problem occured while updating the engine.");
+                    throw new Exception(ex.Message);
+                }
             }
-
-            _mapper.Map(dto, engine);
-
-            var validationerrorlist = EntityValidator.GetValidationResults(engine);
-
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
-            try
-            {
-                await _uow.EngineRepository.UpdateAsync(engine);
-                _logger.Information("Engine is successfully updated.");
-                var enginedto = _mapper.Map<EngineDto>(engine);
-
-                return Ok(enginedto);
-            }
-            catch (Exception ex)
-            {
-                _logger.Warning("Problem occured while updating the engine.");
-                throw new Exception(ex.Message);
-            }
+            return BadRequest(new ApiValidationErrorResponse(validationResult.Errors));
 
         }
 

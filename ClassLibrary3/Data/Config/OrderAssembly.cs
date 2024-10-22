@@ -28,7 +28,7 @@ namespace Infrastucture.Data.Config
 
             builder.Property(e => e.OrderedDate).IsRequired();
             builder.Property(e => e.SellerEmail).IsRequired();
-            builder.Property(e => e.BuyerEmail).IsRequired();
+            builder.Property(e => e.BuyerEmail).IsRequired(false);
             builder.Property(e => e.OrderType).IsRequired().HasConversion(x => x.ToString(), x => (OrderType)Enum.Parse(typeof(OrderType),x.ToString()));
             builder.Property(e => e.OrderStatus).IsRequired().HasConversion(x => x.ToString(), x => (OrderStatus)Enum.Parse(typeof(OrderStatus),x.ToString()));
             builder.Property(e => e.PaymentMethod).IsRequired().HasConversion(x => x.ToString(), x => (PaymentMethod)Enum.Parse(typeof(PaymentMethod),x.ToString()));

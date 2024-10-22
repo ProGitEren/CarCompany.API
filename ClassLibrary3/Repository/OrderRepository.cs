@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
+using FluentValidation;
 using Infrastucture.Data;
 using Infrastucture.DTO.DTO_Orders;
 using Infrastucture.DTO.DTO_OrderVehicles;
@@ -7,6 +8,7 @@ using Infrastucture.Errors;
 using Infrastucture.Extensions;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Params;
+using Infrastucture.Validation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +19,6 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.Validation;
 using static Models.Enums.OrderEnums;
 
 namespace Infrastucture.Repository
@@ -34,12 +35,17 @@ namespace Infrastucture.Repository
             _userManager = userManager;
         }
 
-        public async Task<Tuple<Order, List<string>>> AddAsync(CreateOrderDto dto, Func<CreateOrderVehicleDto, Task<Tuple<OrderVehicle, List<string>>>> orderVehicleFunc)
+        public async Task<Tuple<Order, List<string>>> AddAsync(CreateOrderDto dto, Func<CreateOrderVehicleDto,IValidator<OrderVehicle>, Task<Tuple<OrderVehicle, List<string>>>> orderVehicleFunc, IValidator<Order> _validator, IValidator<OrderVehicle> _orderValidator)
         {
             var ordererrorlist = new List<string>();
             if (dto is not null)
             {
-                var buyer = await _userManager.FindByEmailAsync(dto.BuyerEmail);
+                AppUsers? buyer = null;
+
+                if (dto.BuyerEmail is not null)
+                {
+                    buyer = await _userManager.FindByEmailAsync(dto.BuyerEmail);
+                }
                 var seller = await _userManager.FindByEmailAsync(dto.SellerEmail);
 
                 if (buyer != null)
@@ -47,7 +53,7 @@ namespace Infrastucture.Repository
                     var buyerwithrole = await _userManager.AddRolestoUserAsync(buyer);
                     if (!buyerwithrole.roles.Contains("Buyer")) { ordererrorlist.Add("The entered user does not have Buyer role in the system"); }
                 }
-                
+
                 if (seller != null)
                 {
 
@@ -67,7 +73,7 @@ namespace Infrastucture.Repository
                     {
                         if (!ordererrorlist.Any())
                         {
-                            var createtuple = await orderVehicleFunc(dto.OrderVehicleDto);
+                            var createtuple = await orderVehicleFunc(dto.OrderVehicleDto, _orderValidator);
                             ordervehicle = createtuple.Item1;
                             var list_1 = createtuple.Item2;
                             ordererrorlist.AddRange(list_1);
@@ -78,42 +84,55 @@ namespace Infrastucture.Repository
                     {
                         throw new Exception(ex.Message);
                     }
-
-                    try
+                    
+                    if (!ordererrorlist.Any())
                     {
-                        var order = _mapper.Map<Order>(dto);
-                        if (order != null)
+                        try
                         {
-                            order.OrderVehicleId = ordervehicle.Id;
-                            ordererrorlist.AddRange(EntityValidator.GetValidationResults(order));
-
-                            if (!ordererrorlist.Any())
+                            var order = _mapper.Map<Order>(dto);
+                            if (order != null)
                             {
-                                await _context.Orders.AddAsync(order);
-                                await _context.SaveChangesAsync();
-                            }
+                                order.OrderVehicleId = ordervehicle.Id;
 
-                            return Tuple.Create(order, ordererrorlist);
+                                ordererrorlist.AddRange(_validator.Validate(order).stringErrors());
+
+
+                                if (!ordererrorlist.Any())
+                                {
+                                    await _context.Orders.AddAsync(order);
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                return Tuple.Create(order, ordererrorlist);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
+                    ordererrorlist.Add("Order Vehicle addition failed therefore the process is stopped.");
+                    return Tuple.Create(_mapper.Map<Order>(dto), ordererrorlist);
                 }
-
+                ordererrorlist.Add("Recevied Order Vehicle is empty, it is required.");
                 return Tuple.Create(_mapper.Map<Order>(dto), ordererrorlist);
             }
+            ordererrorlist.Add("Received Order is empty, it is required.");
             return Tuple.Create(new Order(), ordererrorlist);
 
         }
 
-        public async Task<Tuple<Order, List<string>>> UpdateAsync(UpdateOrderDto dto, Func<UpdateOrderVehicleDto, Task<Tuple<OrderVehicle, List<string>>>> orderVehicleFunc)
+        public async Task<Tuple<Order, List<string>>> UpdateAsync(UpdateOrderDto dto, Func<UpdateOrderVehicleDto, IValidator<OrderVehicle> , Task<Tuple<OrderVehicle, List<string>>>> orderVehicleFunc, IValidator<Order> _validator, IValidator<OrderVehicle> _orderValidator)
         {
             var ordererrorlist = new List<string>();
             if (dto is not null)
             {
-                var buyer = await _userManager.FindByEmailAsync(dto.BuyerEmail);
+                AppUsers? buyer = null;
+
+                if (dto.BuyerEmail is not null)
+                {
+                    buyer = await _userManager.FindByEmailAsync(dto.BuyerEmail);
+                }
                 var seller = await _userManager.FindByEmailAsync(dto.SellerEmail);
 
                 if (buyer != null)
@@ -121,12 +140,7 @@ namespace Infrastucture.Repository
                     var buyerwithrole = await _userManager.AddRolestoUserAsync(buyer);
                     if (!buyerwithrole.roles.Contains("Buyer")) { ordererrorlist.Add("The entered user does not have Buyer role in the system"); }
                 }
-                else
-                {
-                    if (dto.OrderStatus == OrderStatus.Sold)
-                        ordererrorlist.Add("Buyer must be specified for sold orders.");
-                }
-            
+
                 if (seller != null)
                 {
 
@@ -139,16 +153,16 @@ namespace Infrastucture.Repository
                 }
 
 
-
                 if (dto.OrderVehicleDto is not null)
                 {
                     var ordervehicle = await _context.OrderVehicles.FindAsync(dto.OrderVehicleDto.Id);
+
 
                     try
                     {
                         if (!ordererrorlist.Any())
                         {
-                            var updatetuple = await orderVehicleFunc(dto.OrderVehicleDto);
+                            var updatetuple = await orderVehicleFunc(dto.OrderVehicleDto,_orderValidator);
                             ordervehicle = updatetuple.Item1;
                             var list_1 = updatetuple.Item2;
                             ordererrorlist.AddRange(list_1);
@@ -158,36 +172,46 @@ namespace Infrastucture.Repository
                     {
                         throw new Exception(ex.Message);
                     }
-
-                    try
+                    if(!ordererrorlist.Any())
                     {
-
-                        var order = await _context.Orders.FindAsync(dto.Id);
-                        _mapper.Map(dto, order);
-
-
-                        if (order != null)
+                        try
                         {
-                            order.OrderVehicleId = ordervehicle.Id;
-                            var validationerrorlist = EntityValidator.GetValidationResults(order);
 
-                            if (validationerrorlist.Any())
+                            var order = await _context.Orders.FindAsync(dto.Id);
+                            if (order.OrderStatus == OrderStatus.Sold)
+                                ordererrorlist.Add("The Order is already sold: Can not be Modified");
+
+                            _mapper.Map(dto, order);
+
+
+                            if (order != null)
                             {
-                                _context.Orders.Update(order);
-                                await _context.SaveChangesAsync();
+                                order.OrderVehicleId = ordervehicle.Id;
+
+                                ordererrorlist.AddRange(_validator.Validate(order).stringErrors());
+
+                                if (!ordererrorlist.Any())
+                                {
+                                    _context.Orders.Update(order);
+                                    await _context.SaveChangesAsync();
+                                }
+
+                                return Tuple.Create(order, ordererrorlist);
+
                             }
-
-                            return Tuple.Create(order, ordererrorlist);
-
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
+                    ordererrorlist.Add("Order Vehicle update failed therefore the process is stopped.");
+                    return Tuple.Create(_mapper.Map<Order>(dto), ordererrorlist);
                 }
+                ordererrorlist.Add("Recevied Order Vehicle is empty, it is required.");
                 return Tuple.Create(await _context.Orders.FindAsync(dto.Id), ordererrorlist);
             }
+            ordererrorlist.Add("Recevied Order is empty, it is required.");
             return Tuple.Create(new Order(), ordererrorlist);
 
         }
@@ -227,7 +251,7 @@ namespace Infrastucture.Repository
             //    .Include(x => x.Category)
             //    .AsNoTracking()
             //    .ToListAsync();
-            
+
 
             //search by Name
             if (!string.IsNullOrEmpty(orderParams.Search))
@@ -237,21 +261,21 @@ namespace Infrastucture.Repository
 
             if (!string.IsNullOrEmpty(orderParams.VehicleId))
                 query = query.Where(x => x.Vehicle.VehicleId == orderParams.VehicleId);
-            
+
             if (!string.IsNullOrEmpty(orderParams.SellerEmail))
                 query = query.Where(x => x.SellerEmail == orderParams.SellerEmail);
-            
+
             if (!string.IsNullOrEmpty(orderParams.BuyerEmail))
                 query = query.Where(x => x.BuyerEmail == orderParams.BuyerEmail);
-            
+
             if (!string.IsNullOrEmpty(orderParams.OrderStatus))
-                query = query.Where(x => x.OrderStatus == (OrderStatus)Enum.Parse(typeof(OrderStatus),orderParams.BuyerEmail));
-            
+                query = query.Where(x => x.OrderStatus == (OrderStatus)Enum.Parse(typeof(OrderStatus), orderParams.OrderStatus));
+
             if (!string.IsNullOrEmpty(orderParams.OrderType))
-                query = query.Where(x => x.OrderType == (OrderType)Enum.Parse(typeof(OrderType),orderParams.BuyerEmail));
-          
+                query = query.Where(x => x.OrderType == (OrderType)Enum.Parse(typeof(OrderType), orderParams.OrderType));
+
             if (!string.IsNullOrEmpty(orderParams.PaymentMethod))
-                query = query.Where(x => x.PaymentMethod == (PaymentMethod)Enum.Parse(typeof(PaymentMethod),orderParams.BuyerEmail));
+                query = query.Where(x => x.PaymentMethod == (PaymentMethod)Enum.Parse(typeof(PaymentMethod), orderParams.PaymentMethod));
 
 
             //sorting
@@ -282,5 +306,19 @@ namespace Infrastucture.Repository
             result.PageItemCount = list.Count;
             return result;
         }
+
+        public async Task<Order> GetByIdWithOrderVehicleAsync(int? Id)
+        {
+            return await _context.Orders.Include(x => x.Vehicle).FirstOrDefaultAsync(d => d.Id == Id);
+        }
+
+        public async Task<IReadOnlyList<Order>> GetSoldOrdersAsync()
+        {
+            return await _context.Orders.Where(x => x.OrderStatus == OrderStatus.Sold && x.IsVehicleOwnerTransferred == false).ToListAsync() as IReadOnlyList<Order>;
+        }
+
     }
+
+    
+
 }

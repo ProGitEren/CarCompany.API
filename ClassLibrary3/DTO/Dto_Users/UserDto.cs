@@ -1,4 +1,5 @@
 ﻿using ClassLibrary2.Entities;
+using Models.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastucture.DTO.Dto_Users
 {
-    public class UserDto
+    public class UserDto 
     {
 
         public string FirstName { get; set; }

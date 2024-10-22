@@ -631,8 +631,10 @@ namespace Infrastucture.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1000L);
 
                     b.Property<string>("BuyerEmail")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVehicleOwnerTransferred")
+                        .HasColumnType("bit");
 
                     b.Property<string>("OrderStatus")
                         .IsRequired()

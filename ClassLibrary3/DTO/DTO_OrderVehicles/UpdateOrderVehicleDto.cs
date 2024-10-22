@@ -10,8 +10,6 @@ namespace Infrastucture.DTO.DTO_OrderVehicles
     public class UpdateOrderVehicleDto
     {
         public int Id { get; set; }
-        //public List<IFormFile>? Images { get; set; }
-
 
         public string VehicleId { get; set; }
 

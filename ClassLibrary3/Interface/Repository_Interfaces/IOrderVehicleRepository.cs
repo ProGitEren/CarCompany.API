@@ -1,4 +1,5 @@
-﻿using Infrastucture.DTO.DTO_OrderVehicles;
+﻿using FluentValidation;
+using Infrastucture.DTO.DTO_OrderVehicles;
 using Infrastucture.Params;
 using Microsoft.AspNetCore.Identity;
 using Models.Entities;
@@ -12,9 +13,9 @@ namespace Infrastucture.Interface.Repository_Interfaces
 {
     public interface IOrderVehicleRepository : IGenericRepository<OrderVehicle, int?>
     {
-        Task<Tuple<OrderVehicle, List<string>>> AddAsync(CreateOrderVehicleDto dto);
+        Task<Tuple<OrderVehicle, List<string>>> AddAsync(CreateOrderVehicleDto dto, IValidator<OrderVehicle> _validator);
 
-        Task<Tuple<OrderVehicle,List<string>>> UpdateAsync(UpdateOrderVehicleDto dto);
+        Task<Tuple<OrderVehicle,List<string>>> UpdateAsync(UpdateOrderVehicleDto dto, IValidator<OrderVehicle> _validator);
 
         Task<bool> DeleteAsync(int? Id);
 

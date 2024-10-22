@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Infrastucture.Data;
 using Infrastucture.DTO.Dto_Engines;
 using Infrastucture.DTO.DTO_OrderVehicles;
 using Infrastucture.Errors;
+using Infrastucture.Extensions;
 using Infrastucture.Helpers;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Interface.Service_Interfaces;
 using Infrastucture.Params;
+using Infrastucture.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +23,6 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebAPI.Validation;
 
 namespace Infrastucture.Repository
 {
@@ -36,7 +38,7 @@ namespace Infrastucture.Repository
             _context = context;
             _fileService = fileService;
         }
-        public async Task<Tuple<OrderVehicle,List<string>>> AddAsync(CreateOrderVehicleDto dto)
+        public async Task<Tuple<OrderVehicle,List<string>>> AddAsync(CreateOrderVehicleDto dto, IValidator<OrderVehicle> _validator)
         {
             var validationerrorlist = new List<string>();
             if (dto is not null)
@@ -48,7 +50,6 @@ namespace Infrastucture.Repository
                         validationerrorlist.Add("The Vehicle with this Id could not found in the system");
                     }
 
-                     validationerrorlist.AddRange(EntityValidator.GetValidationResults(_mapper.Map<OrderVehicle>(dto)));
 
                     if (dto.Images.Any(x => !_fileService.CheckFileType(x))) 
                     {
@@ -69,14 +70,22 @@ namespace Infrastucture.Repository
                     var folderName = _fileService.GenerateUniqueFolderName(rootDirectory);
                     var folderPath = Path.Combine(rootDirectory, folderName);
 
+                    var orderVehicle = _mapper.Map<OrderVehicle>(dto);
+                    orderVehicle.PictureFolderPath = folderPath;
+                    validationerrorlist.AddRange(_validator.Validate(orderVehicle).stringErrors());
+
+                    if (validationerrorlist.Any())
+                    {
+                        return Tuple.Create(orderVehicle, validationerrorlist); // no database operation
+                    }
+
+
                     foreach (var file in dto.Images)
                     {
                         
                         var src = _fileService.SaveFile(file, folderPath);
                     }
 
-                    var orderVehicle = _mapper.Map<OrderVehicle>(dto);
-                    orderVehicle.PictureFolderPath = folderPath;
                     
 
                     await _context.OrderVehicles.AddAsync(orderVehicle);
@@ -92,7 +101,7 @@ namespace Infrastucture.Repository
             return Tuple.Create(new OrderVehicle(), validationerrorlist);
         }
 
-        public async Task<Tuple<OrderVehicle,List<string>>> UpdateAsync(UpdateOrderVehicleDto dto)
+        public async Task<Tuple<OrderVehicle,List<string>>> UpdateAsync(UpdateOrderVehicleDto dto, IValidator<OrderVehicle> _validator)
         {
             var orderVehicle = await _context.OrderVehicles.FindAsync(dto.Id);
             var validationerrorlist = new List<string>();
@@ -106,12 +115,7 @@ namespace Infrastucture.Repository
                         validationerrorlist.Add("The Vehicle with this Id could not found in the system");
                     }
 
-                    validationerrorlist.AddRange(EntityValidator.GetValidationResults(_mapper.Map<OrderVehicle>(dto)));
 
-                    if (validationerrorlist.Any())
-                    {
-                        return Tuple.Create(_mapper.Map<OrderVehicle>(dto), validationerrorlist); // no database operation
-                    }
 
                     //if (dto.Images != null && dto.Images.Count > 0)
                     //{
@@ -175,6 +179,13 @@ namespace Infrastucture.Repository
                     //}
 
                     _mapper.Map(dto, orderVehicle);
+                    validationerrorlist.AddRange(_validator.Validate(orderVehicle).stringErrors());
+
+                    if (validationerrorlist.Any())
+                    {
+                        return Tuple.Create(orderVehicle, validationerrorlist); // no database operation
+                    }
+
                     _context.OrderVehicles.Update(orderVehicle);
                     await _context.SaveChangesAsync();
 

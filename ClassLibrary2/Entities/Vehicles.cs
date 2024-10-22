@@ -26,24 +26,18 @@ namespace Models.Entities
 
         public decimal Averagefuelout { get; set; }
 
-        [Range(0,250,ErrorMessage = "C02 emission should not exceed value of 250.")]
         public int COemmission { get; set; }
 
-        [Range(0, 200)]
         public int FuelCapacity { get; set; }
 
-        [Range(0, 30000)]
         public int MaxAllowedWeight { get; set; }
 
-        [Range(0, 10000)]
         public int MinWeight { get; set; }
 
-        [Range(0,1000)]
         public int BaggageVolume { get; set; }
 
         public int DrivenKM { get; set; }
 
-        [AllowNull]
         [NotMapped]
 
         public string ModelCode { get; set; }

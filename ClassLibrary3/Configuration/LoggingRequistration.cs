@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 namespace Infrastucture.Configuration
 {
@@ -15,14 +16,12 @@ namespace Infrastucture.Configuration
     {
         public static void SeriLogConfiguration(this WebApplicationBuilder builder)
         {
-            builder.Host.UseSerilog((context, services, configuration) => configuration
-          .ReadFrom.Configuration(context.Configuration)
-          .ReadFrom.Services(services)
-          .Enrich.FromLogContext()
-          .Enrich.WithProperty("ApplicationName", context.HostingEnvironment.ApplicationName)
-          .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
-          .WriteTo.Console()
-          .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day));
+            builder.Host.UseSerilog((context, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration); // Read config from appsettings.json
+                   
+            });
 
         }
     }

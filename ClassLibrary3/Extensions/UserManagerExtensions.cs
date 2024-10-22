@@ -35,6 +35,22 @@ namespace Infrastucture.Extensions
 
         }
 
+        public static async Task<AppUsers> FindEmailByClaimWithDetailAsync(this UserManager<AppUsers> userManager, Claim claim)
+        {
+            if (claim.Type != ClaimTypes.Email) { return null; }
+
+            var email = claim.Value;
+
+
+            var appUser = await userManager.Users
+            .Include(x => x.Address)
+            .Include(x => x.Vehicles)
+            .SingleOrDefaultAsync(x => x.Email == email);
+
+            return appUser;
+
+        }
+
 
         public static async Task<AppUsers> FindEmailByEmailAsync(this UserManager<AppUsers> userManager, string? Email)
         {
@@ -59,6 +75,20 @@ namespace Infrastucture.Extensions
         public static async Task<AppUsers> FindEmailByClaimAsync(this UserManager<AppUsers> userManager, ClaimsPrincipal user)
         {
             var email = user?.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+
+            var appUser = await userManager.Users
+            .SingleOrDefaultAsync(x => x.Email == email);
+
+            return appUser;
+
+        }
+
+        public static async Task<AppUsers> FindEmailByClaimAsync(this UserManager<AppUsers> userManager, Claim claim)
+        {
+
+            if (claim.Type != ClaimTypes.Email) { return null; }
+
+            var email = claim.Value;
 
             var appUser = await userManager.Users
             .SingleOrDefaultAsync(x => x.Email == email);

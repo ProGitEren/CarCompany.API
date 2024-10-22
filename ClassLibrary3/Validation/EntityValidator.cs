@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI.Validation
+namespace Infrastucture.Validation
 {
     public class EntityValidator
     {

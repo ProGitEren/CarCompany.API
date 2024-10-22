@@ -1,217 +1,161 @@
 ﻿using AutoMapper;
 using ClassLibrary2.Entities;
+using FluentValidation;
 using Infrastucture.DTO.DTO_Orders;
-using Infrastucture.DTO.DTO_OrderVehicles;
 using Infrastucture.Errors;
-using Infrastucture.Extensions;
 using Infrastucture.Helpers;
 using Infrastucture.Interface.Repository_Interfaces;
 using Infrastucture.Params;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entities;
-using System.Linq.Expressions;
-using WebAPI.Validation;
-using static Models.Enums.OrderEnums;
 
-namespace WebAPI.Controller
+[Route("api/[controller]")]
+[ApiController]
+public class OrderController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class OrderController : ControllerBase
+    private readonly IMapper _mapper;
+    private readonly IUnitOfWork _uow;
+    private readonly Serilog.ILogger _logger;
+    private readonly UserManager<AppUsers> _userManager;
+    private readonly IValidator<Order> _orderValidator;
+    private readonly IValidator<OrderVehicle> _orderVehicleValidator;
+
+    public OrderController(IUnitOfWork uow, IMapper mapper, Serilog.ILogger logger, UserManager<AppUsers> userManager, IValidator<Order> orderValidator, IValidator<OrderVehicle> orderVehicleValidator)
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _uow;
-        private readonly Serilog.ILogger _logger;
-        private readonly UserManager<AppUsers> _userManager;
+        _logger = logger;
+        _uow = uow;
+        _mapper = mapper;
+        _userManager = userManager;
+        _orderValidator = orderValidator;
+        _orderVehicleValidator = orderVehicleValidator;
+    }
 
-        public OrderController(IUnitOfWork uow, IMapper mapper, Serilog.ILogger logger, UserManager<AppUsers> userManager)
+    [HttpPost("create-order")]
+    [Authorize(Roles = "Seller")]
+    public async Task<IActionResult> CreateAsync([FromForm] CreateOrderDto dto)
+    {
+        _logger.Information("Creating order with data: {@OrderData}", dto);
+        try
         {
-            _logger = logger;
-            _uow = uow;
-            _mapper = mapper;
-            _userManager = userManager;
-        }
+            var createtuple = await _uow.OrderRepository.AddAsync(dto, _uow.OrderVehicleRepository.AddAsync, _orderValidator, _orderVehicleValidator);
+            var order = createtuple.Item1;
+            var validationerrorlist = createtuple.Item2;
 
-
-        //[HttpGet("get-all-ordervehicles")]
-        //[Authorize]
-
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    var models = _uow.VehicleModelRepository.GetAll();
-        //    _logger.Information("The Current User is retrieving.");
-        //    if (models == null)
-        //    {
-        //        _logger.Warning("The Current User could not be found in the system.");
-        //        return NotFound(new ApiException(404, "There is no model in the system."));
-        //    }
-
-        //    var dtos = _mapper.Map<IEnumerable<VehicleModelDto>>(models);
-        //    return Ok(dtos);
-
-        //}
-
-        //[HttpGet("get-models")]
-        //[Authorize]
-
-        //public async Task<IActionResult> GetAllPaginated([FromQuery] VehiclemodelParams modelParams)
-        //{
-        //    var src = await _uow.VehicleModelRepository.GetAllAsync(modelParams);
-        //    var models = src.VehicleModelDtos.ToList() as IReadOnlyList<VehicleModelDto>;
-
-        //    return Ok(new Pagination<VehicleModelDto>(modelParams.Pagesize, modelParams.PageNumber, src.PageItemCount, src.TotalItems, models));
-        //}
-
-
-
-        [HttpPost("create-order")]
-        [Authorize(Roles = "Seller")]
-
-        public async Task<IActionResult> CreateAsync([FromForm] CreateOrderDto dto)
-        {
-            try
+            if (validationerrorlist.Any())
             {
-                
-                var createtuple = await _uow.OrderRepository.AddAsync(dto,_uow.OrderVehicleRepository.AddAsync);
-                var order = createtuple.Item1;
-                var validationerrorlist = createtuple.Item2;
-
-                if (validationerrorlist.Any())
-                {
-                    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist }); // no database operation
-                }
-                if (order == null)
-                {
-                    _logger.Warning("This order could not be found in the system.");
-                    return NotFound(new ApiException(404, "This order did not found in the system."));
-                }
-
-                var modeldto = _mapper.Map<OrderDto>(order);
-                return Ok(modeldto);
-
+                _logger.Warning("Order creation failed due to validation errors: {@Errors}", validationerrorlist);
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
             }
-
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-
-        [HttpGet("get-order/{Id}")]
-        [Authorize]
-
-        public async Task<IActionResult> GetOrderAsync(int? Id)
-        {
-            var order = await _uow.OrderRepository.GetByIdAsync(Id);
-            _logger.Information("Order is being retrieved.");
 
             if (order == null)
             {
-                _logger.Warning("This order could not be found in the system.");
-                return NotFound(new ApiException(404, "This order did not found in the system."));
+                _logger.Warning("Order not found in the system after creation.");
+                return NotFound(new ApiException(404, "Order not found in the system."));
             }
 
-            var dto = _mapper.Map<OrderDto>(order);
+            _logger.Information("Order created successfully: {@Order}", order);
+            var modeldto = _mapper.Map<OrderDto>(order);
+            return Ok(modeldto);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while creating the order.");
+            throw new Exception(ex.Message);
+        }
+    }
 
-            return Ok(dto);
+    [HttpGet("get-order/{Id}")]
+    [Authorize]
+    public async Task<IActionResult> GetOrderAsync(int? Id)
+    {
+        _logger.Information("Retrieving order with Id: {OrderId}", Id);
+        var order = await _uow.OrderRepository.GetByIdWithOrderVehicleAsync(Id);
 
+        if (order == null)
+        {
+            _logger.Warning("Order with Id: {OrderId} could not be found in the system.", Id);
+            return NotFound(new ApiException(404, "Order not found in the system."));
         }
 
-        [HttpPut("update-order")]
-        [Authorize(Roles = "Seller")]
+        var dto = _mapper.Map<OrderDto>(order);
+        _logger.Information("Order retrieved successfully: {@Order}", dto);
+        return Ok(dto);
+    }
 
-        public async Task<IActionResult> UpdateOrderVehicleAsync([FromForm] UpdateOrderDto dto)
+    [HttpPut("update-order")]
+    [Authorize(Roles = "Seller")]
+    public async Task<IActionResult> UpdateOrderAsync(UpdateOrderDto dto)
+    {
+        _logger.Information("Updating order with Id: {OrderId}, Data: {@OrderData}", dto.Id, dto);
+        try
         {
+            var updatetuple = await _uow.OrderRepository.UpdateAsync(dto, _uow.OrderVehicleRepository.UpdateAsync, _orderValidator, _orderVehicleValidator);
+            var order = updatetuple.Item1;
+            var validationerrorlist = updatetuple.Item2;
 
-            try
+            if (validationerrorlist.Any())
             {
-                var updatetuple = await _uow.OrderRepository.UpdateAsync(dto, _uow.OrderVehicleRepository.UpdateAsync);
-                var order = updatetuple.Item1;
-                var validationerrorlist = updatetuple.Item2;
-
-                if (validationerrorlist.Any())
-                {
-                    return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist }); // no database operation
-                }
-
-                if (order == null)
-                {
-                    _logger.Warning("This order could not be found in the system.");
-                    return NotFound(new ApiException(404, "This order did not found in the system."));
-                }
-                if (order.OrderStatus == OrderStatus.Sold)
-                {
-                    var buyer = await _userManager.FindByEmailAsync(order.BuyerEmail);
-                    var vehicle = await _uow.VehicleRepository.GetByIdAsync(order.Vehicle.VehicleId);
-                    if (vehicle is null) { return BadRequest(new ApiValidationErrorResponse { Errors = ["Vehicle could not be found in the system."] }); }
-                    vehicle.UserId = buyer.Id;
-                    try
-                    {
-                        await _uow.VehicleRepository.UpdateAsync(vehicle);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
-                }
-                
-                var modeldto = _mapper.Map<OrderDto>(order);
-
-                return Ok(modeldto);
+                _logger.Warning("Order update failed due to validation errors: {@Errors}", validationerrorlist);
+                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-        }
-
-        [HttpDelete("delete-order/{Id}")]
-        [Authorize(Roles = "Seller")]
-
-        public async Task<IActionResult> DeleteOrderAsync(int? Id)
-        {
-
-            var order = await _uow.OrderRepository.GetByIdAsync(Id);
 
             if (order == null)
             {
-                _logger.Warning("This order could not be found in the system.");
-                return NotFound(new ApiException(404, "This order did not found in the system."));
+                _logger.Warning("Order not found in the system during update with Id: {OrderId}", dto.Id);
+                return NotFound(new ApiException(404, "Order not found in the system."));
             }
 
-            try
-            {
-                if (await _uow.OrderRepository.DeleteAsync(Id,_uow.OrderVehicleRepository.DeleteAsync))
-                {
-                    _logger.Information("Order is successfully deleted.");
-                    return Ok("Order successfully deleted.");
-                }
-                return BadRequest(new ApiException(404, "The delete action failed."));
-            }
-            catch (Exception ex)
-            {
-                _logger.Warning("Problem occured while deleting the order.");
-                throw new Exception(ex.Message);
-
-
-            }
+            _logger.Information("Order updated successfully: {@Order}", order);
+            var modeldto = _mapper.Map<OrderDto>(order);
+            return Ok(modeldto);
         }
-
-        [HttpGet("get-orders")]
-        [Authorize]
-
-        public async Task<IActionResult> GetAllPaginated([FromQuery] OrderParams orderParams)
+        catch (Exception ex)
         {
-            var src = await _uow.OrderRepository.GetAllAsync(orderParams);
-            var ordervehicles = src.OrderDtos.ToList() as IReadOnlyList<OrderDto>;
+            _logger.Error(ex, "An error occurred while updating the order with Id: {OrderId}", dto.Id);
+            throw new Exception(ex.Message);
+        }
+    }
 
-            return Ok(new Pagination<OrderDto>(orderParams.Pagesize, orderParams.PageNumber, src.PageItemCount, src.TotalItems, ordervehicles));
+    [HttpDelete("delete-order/{Id}")]
+    [Authorize(Roles = "Seller")]
+    public async Task<IActionResult> DeleteOrderAsync(int? Id)
+    {
+        _logger.Information("Deleting order with Id: {OrderId}", Id);
+        var order = await _uow.OrderRepository.GetByIdAsync(Id);
+
+        if (order == null)
+        {
+            _logger.Warning("Order with Id: {OrderId} could not be found in the system.", Id);
+            return NotFound(new ApiException(404, "Order not found in the system."));
         }
 
+        try
+        {
+            if (await _uow.OrderRepository.DeleteAsync(Id, _uow.OrderVehicleRepository.DeleteAsync))
+            {
+                _logger.Information("Order deleted successfully with Id: {OrderId}", Id);
+                return Ok("Order successfully deleted.");
+            }
+            return BadRequest(new ApiException(404, "Order delete action failed."));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while deleting the order with Id: {OrderId}", Id);
+            throw new Exception(ex.Message);
+        }
+    }
+
+    [HttpGet("get-orders")]
+    [Authorize]
+    public async Task<IActionResult> GetAllPaginated([FromQuery] OrderParams orderParams)
+    {
+        _logger.Information("Retrieving paginated orders. PageNumber: {PageNumber}, PageSize: {PageSize}", orderParams.PageNumber, orderParams.Pagesize);
+        var src = await _uow.OrderRepository.GetAllAsync(orderParams);
+        var ordervehicles = src.OrderDtos.ToList() as IReadOnlyList<OrderDto>;
+
+        _logger.Information("Orders retrieved successfully with total items: {TotalItems}", src.TotalItems);
+        return Ok(new Pagination<OrderDto>(orderParams.Pagesize, orderParams.PageNumber, src.PageItemCount, src.TotalItems, ordervehicles));
     }
 }

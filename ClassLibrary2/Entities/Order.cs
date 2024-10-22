@@ -24,6 +24,7 @@ namespace Models.Entities
         
         public TransferAddress TransferAddress { get; set; }
 
+        public bool IsVehicleOwnerTransferred { get; set; } = false;
         // Navigational Properties
 
         //public string VehicleID { get; set; }

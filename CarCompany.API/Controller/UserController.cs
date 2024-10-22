@@ -29,6 +29,12 @@ using Infrastucture.DTO.Dto_Vehicles;
 using Infrastucture.DTO.Dto_Engines;
 using Infrastucture.Helpers;
 using Infrastucture.Params;
+using FluentValidation;
+using MediatR;
+using WebAPI.Queries.UserQueries;
+using LanguageExt.Common;
+using ErrorOr;
+using WebAPI.Commands.UserCommands;
 
 
 
@@ -40,256 +46,63 @@ namespace CarCompany.API.Controller
     public class UserController : ControllerBase
     {
         
-        private readonly SignInManager<AppUsers> _signinmanager;
-        private readonly UserManager<AppUsers> _usermanager;
-        private readonly IMapper _mapper;
-        private readonly ITokenServices _tokenservices;
-        private readonly IUnitOfWork _uow;
-        private readonly IOptions<IdentityOptions> _identityoptions;
-        private readonly Serilog.ILogger _logger;
-        private readonly IHttpContextAccessor _httpcontextAccessor;
-        private readonly RoleManager<IdentityRole> _rolemanager;
-        private readonly IPasswordHasher<AppUsers> _passwordhasher;
-        private readonly EncryptionService _encryptionservice;
-        private readonly IVinGenerationService _vingenerationservice;
-
-        public UserController(SignInManager<AppUsers> signinmanager, UserManager<AppUsers> usermanager, IMapper mapper,
-            ITokenServices tokenServices, IUnitOfWork uow, IOptions<IdentityOptions> options,
-            Serilog.ILogger logger, IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> rolemanager,
-            IPasswordHasher<AppUsers> passwordHasher,EncryptionService encryptionService, IVinGenerationService vinGenerationService)
+        //private readonly SignInManager<AppUsers> _signinmanager;
+        //private readonly UserManager<AppUsers> _usermanager;
+        //private readonly IMapper _mapper;
+        //private readonly ITokenServices _tokenservices;
+        //private readonly IUnitOfWork _uow;
+        //private readonly IOptions<IdentityOptions> _identityoptions;
+        //private readonly Serilog.ILogger _logger;
+        //private readonly IHttpContextAccessor _httpcontextAccessor;
+        //private readonly RoleManager<IdentityRole> _rolemanager;
+        //private readonly IPasswordHasher<AppUsers> _passwordhasher;
+        //private readonly EncryptionService _encryptionservice;
+        //private readonly IVinGenerationService _vingenerationservice;
+        private readonly IMediator _mediator;
+        
+        public UserController(/*SignInManager<AppUsers> signinmanager, UserManager<AppUsers> usermanager, IMapper mapper,*/
+        //    ITokenServices tokenServices, IUnitOfWork uow, IOptions<IdentityOptions> options,
+        //    Serilog.ILogger logger, IHttpContextAccessor httpContextAccessor, RoleManager<IdentityRole> rolemanager,
+        //    IPasswordHasher<AppUsers> passwordHasher,EncryptionService encryptionService, IVinGenerationService vinGenerationService,
+            IMediator mediator
+            )
         {
-            _signinmanager = signinmanager;
-            _usermanager = usermanager;
-            _mapper = mapper;
-            _tokenservices = tokenServices;
-            _uow = uow;
-            _identityoptions = options;
-            _logger = logger;
-            _httpcontextAccessor = httpContextAccessor;
-            _rolemanager = rolemanager;
-            _httpcontextAccessor.HttpContext = _httpcontextAccessor.HttpContext;
-            _passwordhasher = passwordHasher;
-            _encryptionservice = encryptionService;
-            _vingenerationservice = vinGenerationService;
-           
-             
+            //_signinmanager = signinmanager;
+            //_usermanager = usermanager;
+            //_mapper = mapper;
+            //_tokenservices = tokenServices;
+            //_uow = uow;
+            //_identityoptions = options;
+            //_logger = logger;
+            //_httpcontextAccessor = httpContextAccessor;
+            //_rolemanager = rolemanager;
+            //_httpcontextAccessor.HttpContext = _httpcontextAccessor.HttpContext;
+            //_passwordhasher = passwordHasher;
+            //_encryptionservice = encryptionService;
+            //_vingenerationservice = vinGenerationService;
+            _mediator = mediator;
          }
 
-        private string GetCorrelationId()
-        {
-            return _httpcontextAccessor.HttpContext?.TraceIdentifier;
-        }
+       
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto logindto)
         {
-            var correlationId = GetCorrelationId();
-            string password;
+            var query = new LoginQuery(logindto);
+            var result = await _mediator.Send(query);
 
-            try
-            {
-                // Try to decrypt the password
-                password = _encryptionservice.Decrypt(logindto.EncryptedPassword);
-                _logger.Information("Decrypting encrypted password for user {Email}, CorrelationId: {CorrelationId}", logindto.Email, correlationId);
-            }
-            catch
-            {
-                // If decryption fails, assume the password is not encrypted and encrypt it
-
-                password = logindto.EncryptedPassword; // if the api administrator enters a normal password 
-                _logger.Information("Using provided encrypted password for user {Email}, CorrelationId: {CorrelationId}", logindto.Email, correlationId);
-            }
-
-
-
-            var user = await _usermanager.FindByEmailAsync(logindto.Email);
-            if (user is null)
-            {
-                _logger.Warning("Login failed for user {Email}: User not found, CorrelationId: {CorrelationId}", logindto.Email, correlationId);
-                return Unauthorized(new ApiException(401,"The email could not found in the system."));
-            }
-
-            var result = await _signinmanager.CheckPasswordSignInAsync(user, password, false);
-            if (result.Succeeded)
-            {
-                await _usermanager.ResetAccessFailedCountAsync(user);
-                _logger.Information("User {Email} logged in successfully, CorrelationId: {CorrelationId}", logindto.Email, correlationId);
-                return Ok(new UserDto
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Token = await _tokenservices.CreateToken(user)
-                });
-            }
-
-            await _usermanager.AccessFailedAsync(user);
-
-            if (await _usermanager.IsLockedOutAsync(user))
-            {
-                var lockoutEnd = await _usermanager.GetLockoutEndDateAsync(user);
-                var timeRemaining = lockoutEnd.HasValue ? lockoutEnd.Value - DateTimeOffset.UtcNow : TimeSpan.Zero;
-                var formattedTime = $"{(int)timeRemaining.TotalMinutes:D2}:{timeRemaining.Seconds:D2}";
-
-                _logger.Warning("User {Email} account locked. Time remaining: {TimeRemaining}, CorrelationId: {CorrelationId}", logindto.Email, formattedTime, correlationId);
-                return Unauthorized(new ApiException(401, $"Account is locked. Try again after {formattedTime} minutes."));
-            }
-
-            int attemptsLeft = _identityoptions.Value.Lockout.MaxFailedAccessAttempts - await _usermanager.GetAccessFailedCountAsync(user);
-            _logger.Warning("Invalid password attempt for user {Email}. Attempts left: {AttemptsLeft}, CorrelationId: {CorrelationId}", logindto.Email, attemptsLeft, correlationId);
-            return Unauthorized(new ApiException(401, $"Invalid password. {attemptsLeft} attempts left."));
+            return result.ToOk();
         }
 
-        [HttpPost("check-email")]
-        public async Task<ActionResult<bool>> CheckEmailExist([FromQuery] string email)
-        {
-            var correlationId = GetCorrelationId();
-            var result = await _usermanager.FindByEmailAsync(email);
-            if (result != null)
-            {
-                _logger.Information("Email check for {Email}: exists, CorrelationId: {CorrelationId}", email, correlationId);
-                return true;
-            }
-
-            _logger.Information("Email check for {Email}: does not exist, CorrelationId: {CorrelationId}", email, correlationId);
-            return false;
-        }
+       
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto registerdto)
         {
-            
-            var correlationId = GetCorrelationId();
-            var password = string.Empty;
+            var query = new RegisterQuery(registerdto);
+            var result = await _mediator.Send(query);
 
-            try
-            {
-                password = _encryptionservice.Decrypt(registerdto.EncryptedPassword);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            _logger.Information("Registration attempt for user {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-
-            if ((await CheckEmailExist(registerdto.Email)).Value)
-            {
-                _logger.Warning("Registration failed for {Email}: Email already taken, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["This Email is already taken"]
-                });
-            }
-
-            if (!await _usermanager.IsPasswordUniqueAsync(password, _logger, _passwordhasher, correlationId))
-            {
-                _logger.Warning("Registration failed for {Email}: Password already in use, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["This password is already in use."]
-                });
-            }
-
-            var passwordvalidationresult =  PasswordValidation.ValidatePassword(password);
-
-            if (!passwordvalidationresult.IsValid) 
-            {
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = passwordvalidationresult.Errors
-                });
-
-            }
-
-
-            var roleexists = await _rolemanager.RoleExistsAsync(registerdto.Role);
-
-            if (!roleexists) 
-            {
-                _logger.Warning("Registration failed for {Role}: Role does not exist, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = [$"The role {registerdto.Role} does not exist in the system."]
-                });
-            }
-
-            //THIS IS VERY IMPORTANT AS THE HTML CONTEXT CAN BE CHANGED THE STRING SHOULD BE CHECKED HERE
-
-            //if (registerdto.Role.ToLower() == "admin")
-            //{
-            //    _logger.Error("Registration failed for {Role}: Unauthorized user tried to register as ADMIN!!, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
-            //    return new BadRequestObjectResult(new ApiValidationErrorResponse
-            //    {
-            //        Errors = [$"You are not authorized to register as Admin to the system."]
-            //    });
-            //}
-
-            var address = _mapper.Map<Address>(registerdto.Address);
-
-            var validationerrorlist = EntityValidator.GetValidationResults(address);
-
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
-            try
-            {
-                await _uow.AddressRepository.AddAsync(address);
-            }
-            catch (Exception ex) 
-            {
-                throw new Exception(ex.Message);
-            }
-
-            var user = new AppUsers
-            {
-                FirstName = registerdto.FirstName,
-                LastName = registerdto.LastName,
-                Email = registerdto.Email,
-                UserName = registerdto.Email,
-                Phone = registerdto.Phone,
-                birthtime = registerdto.birthtime,
-                AddressId = address.AddressId,
-            };
-
-            var validationerrorlist_2 = EntityValidator.GetValidationResults(user);
-
-            if (validationerrorlist_2.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist_2 });
-            }
-
-            try
-            {
-                var result = await _usermanager.CreateAsync(user, password);
-                if (result.Succeeded)
-                {
-
-                    await _usermanager.AddToRoleAsync(user, registerdto.Role);
-                    _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role, correlationId);
-                    return Ok(new UserDto
-                    {
-                        Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Token = await _tokenservices.CreateToken(user)
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-                throw new Exception(ex.Message); // Internal Server Error
-            }
-
-            await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-            _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-            return BadRequest(new ApiValidationErrorResponse
-            {
-                Errors = [$"Unexpected Error Happened: ."]
-            });
+            return result.ToOk();
 
         }
 
@@ -300,151 +113,10 @@ namespace CarCompany.API.Controller
 
         public async Task<IActionResult> RegisterAdminAsync(RegisterDto registerdto) 
         {
-            var correlationId = GetCorrelationId();
-            string password;
+           var query = new RegisterAdminQuery(registerdto);
+           var result = await _mediator.Send(query);
 
-            try
-            {
-                // Try to decrypt the password
-                password = _encryptionservice.Decrypt(registerdto.EncryptedPassword);
-                _logger.Information("Using provided encrypted password for user {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-            }
-            catch
-            {
-                // If decryption fails, assume the password is not encrypted and encrypt it
-
-                password = registerdto.EncryptedPassword; // if the api administrator enters a normal password 
-                _logger.Information("Encrypting provided password for user {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-            }
-
-           
-            _logger.Information("Registration attempt for user {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-
-            if (CheckEmailExist(registerdto.Email).Result.Value)
-            {
-                _logger.Warning("Registration failed for {Email}: Email already taken, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["This Email is already taken"]
-                });
-            }
-          
-            if (!await _usermanager.IsPasswordUniqueAsync(password,_logger,_passwordhasher,correlationId))
-            {
-                _logger.Warning("Registration failed for {Email}: Password already in use, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["This password is already in use."]
-                });
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.Warning("Registration failed for {Email}: Model state invalid, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-                return BadRequest(ModelState);
-            }
-
-
-
-            var passwordvalidationresult = PasswordValidation.ValidatePassword(password);
-
-            if (!passwordvalidationresult.IsValid)
-            {
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = passwordvalidationresult.Errors
-                });
-
-            }
-
-            var roleexists = await _rolemanager.RoleExistsAsync(registerdto.Role);
-
-            if (!roleexists)
-            {
-                _logger.Warning("Registration failed for {Role}: Role does not exist, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = [$"The role {registerdto.Role} does not exist in the system."]
-                });
-            }
-
-            // THIS IS VERY IMPORTANT AS THE HTML CONTEXT CAN BE CHANGED THE STRING SHOULD BE CHECKED HERE
-
-            //if (registerdto.Role.ToLower() == "admin")
-            //{
-            //    _logger.Error("Registration failed for {Role}: Unauthorized user tried to register as ADMIN!!, CorrelationId: {CorrelationId}", registerdto.Role, correlationId);
-            //    return new BadRequestObjectResult(new ApiValidationErrorResponse
-            //    {
-            //        Errors = new[] { $"You are not authorized to register as Admin to the system." }
-            //    });
-            //}
-
-            var address = _mapper.Map<Address>(registerdto.Address);
-            
-            
-            try
-            {
-                await _uow.AddressRepository.AddAsync(address);
-
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            
-
-
-            var user = new AppUsers
-            {
-                FirstName = registerdto.FirstName,
-                LastName = registerdto.LastName,
-                Email = registerdto.Email,
-                UserName = registerdto.Email,
-                Phone = registerdto.Phone,
-                birthtime = registerdto.birthtime,
-                AddressId = address.AddressId,
-               
-
-            };
-
-            var validationerrorlist = EntityValidator.GetValidationResults(user);
-
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
-            try
-            {
-                var result = await _usermanager.CreateAsync(user, password);
-                if (result.Succeeded)
-                {
-
-                    await _usermanager.AddToRoleAsync(user, registerdto.Role);
-                    _logger.Information("User {Email} registered successfully with role {role}, CorrelationId: {CorrelationId}", registerdto.Email, registerdto.Role, correlationId);
-                    return Ok(new UserDto
-                    {
-                        Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Token = await _tokenservices.CreateToken(user)
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-                throw new Exception(ex.Message); // Internal Server Error
-            }
-
-            await _uow.AddressRepository.DeleteAsync(address.AddressId); // if the user registration failed address should be removed as well
-            _logger.Error("Unexpected error occurred during registration for {Email}, CorrelationId: {CorrelationId}", registerdto.Email, correlationId);
-            return BadRequest(new ApiValidationErrorResponse
-            {
-                Errors = [$"Unexpected Error Happened: ."]
-            });
+           return result.ToOk();
         }
 
         //This function will be only used in API
@@ -553,344 +225,214 @@ namespace CarCompany.API.Controller
 
         public async Task<IActionResult> GetAllPaginated([FromQuery] UserParams userParams)
         {
-            var src = await _uow.UserRepository.GetUsersWithRoleAsync(_usermanager, userParams, _mapper);
-            var users = src.UserDtos.ToList() as IReadOnlyList<UserwithdetailsDto>;
+            var query = new GetAllUsersQuery(userParams);
+            var result = await _mediator.Send(query);
 
-            return Ok(new Pagination<UserwithdetailsDto>(userParams.Pagesize, userParams.PageNumber, src.PageItemCount, src.TotalItems, users));
+            return result.ToOk();                                                               
         }
 
 
-        [Authorize]
-        [HttpGet("get-current-user")]
-        public async Task<ActionResult> GetCurrentUserAsync()
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving current user, CorrelationId: {CorrelationId}", correlationId);
+        //[Authorize]
+        //[HttpGet("get-current-user")]
+        //public async Task<ActionResult> GetCurrentUserAsync()
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving current user, CorrelationId: {CorrelationId}", correlationId);
 
-            var user = await _usermanager.FindEmailByClaimAsync(User);
-            if (user == null)
-            {
-                _logger.Warning("Current user could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
-                return Unauthorized(new ApiException(401, "The current user is not authenticated."));
-            }
+        //    var user = await _usermanager.FindEmailByClaimAsync(User);
+        //    if (user == null)
+        //    {
+        //        _logger.Warning("Current user could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
+        //        return Unauthorized(new ApiException(401, "The current user is not authenticated."));
+        //    }
 
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            UserDto userdto = _mapper.Map<UserDto>(user);
-            userdto.Token = token;
+        //    var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        //    UserDto userdto = _mapper.Map<UserDto>(user);
+        //    userdto.Token = token;
 
-            _logger.Information("Current user retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
-            return Ok(userdto);
-        }
+        //    _logger.Information("Current user retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
+        //    return Ok(userdto);
+        //}
 
         [Authorize]
         [HttpGet("get-current-user-with-Detail")]
-        public async Task<ActionResult> GetCurrentUserWithDetaisAsync()
+        public async Task<IActionResult> GetCurrentUserWithDetaisAsync()
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving current user with address, CorrelationId: {CorrelationId}", correlationId);
-
-            var user = await _usermanager.FindEmailByClaimWithDetailAsync(User);
-            user = await _usermanager.AddRolestoUserAsync(user);
-
-            if (user == null)
-            {
-                _logger.Warning("Current user with address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
-                return Unauthorized(new ApiException(401, "The current user is not authenticated."));
-            }
-
+            
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-                    var userwithaddressdto = _mapper.Map<UserwithdetailsDto>(user);
-            userwithaddressdto.Token = token;
+            var claim = User.Claims?.Where(x => x.Type == ClaimTypes.Email).SingleOrDefault();
+            var query = new GetCurrentUserQuery(claim, token);
+            var result = await _mediator.Send(query);
 
-            _logger.Information("Current user with address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
-            return Ok(userwithaddressdto);
-        }
+            return result.ToOk();
+           
+        } 
+                                                                                        
+        //[Authorize]
+        //[HttpGet("get-user-Address")]
+        //public async Task<ActionResult> GetUserAddress()
+        //{ 
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving user address, CorrelationId: {CorrelationId}", correlationId);
 
-        [Authorize]
-        [HttpGet("get-user-Address")]
-        public async Task<ActionResult> GetUserAddress()
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving user address, CorrelationId: {CorrelationId}", correlationId);
+        //    var user = await _usermanager.FindEmailByClaimWithDetailAsync(User);
+        //    if (user == null)
+        //    {
+        //        _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
+        //        return Unauthorized(new ApiException(401, "The current user is not authenticated."));
+        //    }
 
-            var user = await _usermanager.FindEmailByClaimWithDetailAsync(User);
-            if (user == null)
-            {
-                _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
-                return Unauthorized(new ApiException(401, "The current user is not authenticated."));
-            }
+        //    var useraddressdto = _mapper.Map<AddressDto>(user.Address);
 
-            var useraddressdto = _mapper.Map<AddressDto>(user.Address);
-
-            _logger.Information("User address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
-            return Ok(useraddressdto);
-        }
+        //    _logger.Information("User address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
+        //    return Ok(useraddressdto);
+        //}
 
         [Authorize]
         [HttpPut("update-user-Address")]
-        public async Task<ActionResult> UpdateUserAddress(AddressDto addressdto)
+        public async Task<IActionResult> UpdateUserAddress(AddressDto addressdto)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Updating user address, CorrelationId: {CorrelationId}", correlationId);
+            var command = new UpdateUserAddressCommand(addressdto);
+            var result = await _mediator.Send(command);
 
-            var user = await _usermanager.Users.Where(x => x.AddressId == addressdto.AddressId).Include(x=> x.Address).FirstOrDefaultAsync(); // find the user assigned to the address
-            if (user == null)
-            {
-                _logger.Warning("User address could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
-                return Unauthorized(new ApiException(401, "The current user is not authenticated."));
-            }
-            
-            _mapper.Map(addressdto, user.Address);
-            var validationerrorlist = EntityValidator.GetValidationResults(user.Address);
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
-
-            await _uow.AddressRepository.UpdateAsync(user.Address);
-            var result = await _usermanager.UpdateAsync(user);
-
-            if (result.Succeeded)
-            {
-                _logger.Information("User address updated successfully, CorrelationId: {CorrelationId}", correlationId);
-                return Ok(_mapper.Map<AddressDto>(user.Address));
-            }
-
-            _logger.Error("Problem in updating user address, CorrelationId: {CorrelationId}", correlationId);
-            return new BadRequestObjectResult(new ApiValidationErrorResponse
-            {
-                Errors = [$"Problem in updating this {User}'s Address."]
-            });
+            return result.ToOk();
         }
 
        
         [Authorize]
         [HttpGet("get-Address-by-id/{Id}")]
-        public async Task<ActionResult> GetAddressById(Guid Id)
+        public async Task<IActionResult> GetAddressById(Guid Id)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Updating user address, CorrelationId: {CorrelationId}", correlationId);
+           var query = new GetAddressByIdQuery(Id);
+           var result = await _mediator.Send(query);
 
-            if (Id == Guid.Empty)
-            {
-                return NotFound(new ApiException(404, "The address Id is null"));
-            }
+           return result.ToOk();
+        }
 
-            var address = await _uow.AddressRepository.GetByIdAsync(Id);
+
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet("get-all-users")]
+        //public async Task<ActionResult> GetAllAsync()
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving all users, CorrelationId: {CorrelationId}", correlationId);
+
+        //    var users = await _usermanager.GetAllUsersAsync();
+        //    if (users != null)
+        //    {
+        //        _logger.Information("All users retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
+        //        return Ok(_mapper.Map<IReadOnlyList<UserDto>>(users));
+        //    }
+
+        //    _logger.Warning("No users found, CorrelationId: {CorrelationId}", correlationId);
+        //    return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
+        //}
+
+
+
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet("get-all-users-with-Detail")]
+        //public async Task<ActionResult> GetAllWithDetailsAsync()
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving all users with address, CorrelationId: {CorrelationId}", correlationId);
+
+        //    var users = await _usermanager.GetAllUsersWithDetailsAsync();
+        //    var userswithrole = await _usermanager.AddRolestoListAsync(users);
             
+        //    if (users != null)
+        //    {
+        //        _logger.Information("All users with address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
+        //        return Ok(_mapper.Map<IReadOnlyList<UsernotokenDto>>(users));
+        //    }
 
-            if (address != null)
-            {
-                _logger.Information("User address found, CorrelationId: {CorrelationId}", correlationId);
-                return Ok(_mapper.Map<AddressDto>(address));
-            }
+        //    _logger.Warning("No users with address found, CorrelationId: {CorrelationId}", correlationId);
+        //    return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
+        //}
 
-            _logger.Error("Problem in retrieving user address, CorrelationId: {CorrelationId}", correlationId);
-            return new BadRequestObjectResult(new ApiValidationErrorResponse
-            {
-                Errors = [$"Problem in retrieving address."]
-            });
-        }
+        //[Authorize]
+        //[HttpGet("get-user-by-Id/{Id}")]
+        //public async Task<ActionResult> GetUserWithId(string? Id)
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving user by Id {Id}, CorrelationId: {CorrelationId}", Id, correlationId);
 
+        //    if (Id == null)
+        //    {
+        //        _logger.Warning("Retrieved Id is null, CorrelationId: {CorrelationId}", correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["The retrieved Id is null."]
+        //        });
+        //    }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("get-all-users")]
-        public async Task<ActionResult> GetAllAsync()
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving all users, CorrelationId: {CorrelationId}", correlationId);
+        //    var user = await _usermanager.FindByIdAsync(Id);
+        //    if (user != null)
+        //    {
+        //        _logger.Information("User retrieved by Id {Id} successfully, CorrelationId: {CorrelationId}", Id, correlationId);
+        //        return Ok(_mapper.Map<UserDto>(user));
+        //    }
 
-            var users = await _usermanager.GetAllUsersAsync();
-            if (users != null)
-            {
-                _logger.Information("All users retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
-                return Ok(_mapper.Map<IReadOnlyList<UserDto>>(users));
-            }
-
-            _logger.Warning("No users found, CorrelationId: {CorrelationId}", correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
-        }
-
-
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("get-all-users-with-Detail")]
-        public async Task<ActionResult> GetAllWithDetailsAsync()
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving all users with address, CorrelationId: {CorrelationId}", correlationId);
-
-            var users = await _usermanager.GetAllUsersWithDetailsAsync();
-            var userswithrole = await _usermanager.AddRolestoListAsync(users);
-            
-            if (users != null)
-            {
-                _logger.Information("All users with address retrieved successfully, CorrelationId: {CorrelationId}", correlationId);
-                return Ok(_mapper.Map<IReadOnlyList<UsernotokenDto>>(users));
-            }
-
-            _logger.Warning("No users with address found, CorrelationId: {CorrelationId}", correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "Any user could not be found in the application."));
-        }
-
-        [Authorize]
-        [HttpGet("get-user-by-Id/{Id}")]
-        public async Task<ActionResult> GetUserWithId(string? Id)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving user by Id {Id}, CorrelationId: {CorrelationId}", Id, correlationId);
-
-            if (Id == null)
-            {
-                _logger.Warning("Retrieved Id is null, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The retrieved Id is null."]
-                });
-            }
-
-            var user = await _usermanager.FindByIdAsync(Id);
-            if (user != null)
-            {
-                _logger.Information("User retrieved by Id {Id} successfully, CorrelationId: {CorrelationId}", Id, correlationId);
-                return Ok(_mapper.Map<UserDto>(user));
-            }
-
-            _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", Id, correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "The User with this Id could not be found."));
-        }
+        //    _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", Id, correlationId);
+        //    return new NotFoundObjectResult(new ApiException(404, "The User with this Id could not be found."));
+        //}
 
         [Authorize]
         [HttpGet("get-user-by-Id-with-Address/{Id}")]
-        public async Task<ActionResult> GetUserWithIdWithAddress(string? Id)
+        public async Task<IActionResult> GetUserWithIdWithAddress(string? Id)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving user by Id with address {Id}, CorrelationId: {CorrelationId}", Id, correlationId);
+            var query = new GetUserWithIdWithAddressQuery(Id);
+            var result = await _mediator.Send(query);
 
-            if (Id == null)
-            {
-                _logger.Warning("Retrieved Id is null, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The retrieved Id is null."]
-                });
-            }
-
-            var user = await _usermanager.Users.Where(x => x.Id == Id).Include(y => y.Address).FirstOrDefaultAsync();
-            if (user != null)
-            {
-                var userdto = _mapper.Map<UsernotokenDto>(user);
-                userdto.AddressDto = _mapper.Map<AddressDto>(user.Address);
-
-                _logger.Information("User retrieved by Id with address {Id} successfully, CorrelationId: {CorrelationId}", Id, correlationId);
-                return Ok(userdto);
-            }
-
-            _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", Id, correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "The User with this Id could not be found."));
+            return result.ToOk();
         }
 
-        [Authorize]
-        [HttpGet("get-user-by-email/{email}")]
-        public async Task<ActionResult> GetUserWithEmail(string? email)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving user by email {Email}, CorrelationId: {CorrelationId}", email, correlationId);
+        //[Authorize]
+        //[HttpGet("get-user-by-email/{email}")]
+        //public async Task<ActionResult> GetUserWithEmail(string? email)
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Retrieving user by email {Email}, CorrelationId: {CorrelationId}", email, correlationId);
 
-            if (email == null)
-            {
-                _logger.Warning("Retrieved email is null, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The retrieved email is null."]
-                });
-            }
+        //    if (email == null)
+        //    {
+        //        _logger.Warning("Retrieved email is null, CorrelationId: {CorrelationId}", correlationId);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = ["The retrieved email is null."]
+        //        });
+        //    }
 
-            var user = await _usermanager.FindByEmailAsync(email);
-            if (user != null)
-            {
-                _logger.Information("User retrieved by email {Email} successfully, CorrelationId: {CorrelationId}", email, correlationId);
-                return Ok(_mapper.Map<UserDto>(user));
-            }
+        //    var user = await _usermanager.FindByEmailAsync(email);
+        //    if (user != null)
+        //    {
+        //        _logger.Information("User retrieved by email {Email} successfully, CorrelationId: {CorrelationId}", email, correlationId);
+        //        return Ok(_mapper.Map<UserDto>(user));
+        //    }
 
-            _logger.Warning("User with email {Email} could not be found, CorrelationId: {CorrelationId}", email, correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "The User with this email could not be found."));
-        }
+        //    _logger.Warning("User with email {Email} could not be found, CorrelationId: {CorrelationId}", email, correlationId);
+        //    return new NotFoundObjectResult(new ApiException(404, "The User with this email could not be found."));
+        //}
 
         [Authorize]
         [HttpGet("get-user-by-email-with-Detail/{email}")]
-        public async Task<ActionResult> GetUserWithEmailWithDetail(string? email)
+        public async Task<IActionResult> GetUserWithEmailWithDetail(string? email)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Retrieving user by email with address {Email}, CorrelationId: {CorrelationId}", email, correlationId);
+            var query = new GetUserWithEmailWithDetailQuery(email);
+            var result = await _mediator.Send(query);
 
-            if (email == null)
-            {
-                _logger.Warning("Retrieved email is null, CorrelationId: {CorrelationId}", correlationId);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = ["The retrieved email is null."]
-                });
-            }
-
-            var user = await _usermanager.Users.Where(x => x.Email == email).Include(y => y.Address).Include(x=> x.Vehicles).FirstOrDefaultAsync();
-            user = await _usermanager.AddRolestoUserAsync(user);
-
-            if (user != null)
-            {
-                var userdto = _mapper.Map<UsernotokenDto>(user);
-                _logger.Information("User retrieved by email with address {Email} successfully, CorrelationId: {CorrelationId}", email, correlationId);
-                return Ok(userdto);
-            }
-
-            _logger.Warning("User with email {Email} could not be found, CorrelationId: {CorrelationId}", email, correlationId);
-            return new NotFoundObjectResult(new ApiException(404, "The User with this email could not be found."));
+            return result.ToOk();
         }
 
         [Authorize]
         [HttpPut("update-user")]
-        public async Task<ActionResult> UpdateUser(UpdateUserDto userdto)
+        public async Task<IActionResult> UpdateUser(UpdateUserDto userdto)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Updating user, CorrelationId: {CorrelationId}", correlationId);
+            var claim = User.Claims?.Where(x => x.Type == ClaimTypes.Email).SingleOrDefault();
+            var command = new UpdateUserCommand(userdto, claim);
+            var result = await _mediator.Send(command);
 
-            var user = await _usermanager.FindEmailByClaimAsync(User);
-            //user = await _usermanager.AddRolestoUserAsync(user);
-            if (user == null)
-            {
-                _logger.Warning("User could not be found by claims, CorrelationId: {CorrelationId}", correlationId);
-                return NotFound(new ApiException(404, "The current user could not be found by claims."));
-            }
-
-            _mapper.Map(userdto, user);
-            var validationerrorlist = EntityValidator.GetValidationResults(user);
-            if (validationerrorlist.Any())
-            {
-                return BadRequest(new ApiValidationErrorResponse { Errors = validationerrorlist });
-            }
-
-            user.UserName = user.Email;
-
-            var result = await _usermanager.UpdateAsync(user);
-            if (result.Succeeded)
-            {
-                // As the user details change the token should be change
-                // Regenerate the token with updated claims
-                var newToken = await  _tokenservices.CreateToken(user);
-
-                var updateduser = _mapper.Map<UserDto>(user);
-                updateduser.Token = newToken;
-
-                _logger.Information("User updated successfully, CorrelationId: {CorrelationId}", correlationId);
-                return Ok(updateduser);
-            }
-
-            _logger.Error("Problem in updating user, CorrelationId: {CorrelationId}", correlationId);
-            return new BadRequestObjectResult(new ApiValidationErrorResponse
-            {
-                Errors = [$"Problem in updating this {User}'s Address."]
-            });
+            return result.ToOk();
         }
 
         //[HttpPut("change-password")]
@@ -946,79 +488,44 @@ namespace CarCompany.API.Controller
 
         [Authorize]
         [HttpDelete("delete-user/{email}")]
-        public async Task<ActionResult> DeleteUser(string? email)
+        public async Task<IActionResult> DeleteUser(string? email)
         {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Deleting user {Email}, CorrelationId: {CorrelationId}", email, correlationId);
+            var query = new DeleteUserQuery(email);
+            var result = await _mediator.Send(query);
 
-            var user = await _usermanager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                _logger.Warning("User with Email {Email} could not be found, CorrelationId: {CorrelationId}", email, correlationId);
-                return NotFound(new ApiException(404, "The user with this id could not find."));
-            }
-
-            var addressId = user.AddressId;
-            //var vehicleId = user.VehicleId;
-            var result = await _usermanager.DeleteAsync(user);
-
-            if (result.Succeeded)
-            {
-                try
-                {
-                    await _uow.AddressRepository.DeleteAsync(addressId);
-                    //await _uow.VehicleRepository.DeleteAsync(vehicleId);
-                    _logger.Information("User,vehicle and address deleted successfully, CorrelationId: {CorrelationId}", correlationId);
-                    return Ok("The user and the address successfully deleted.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error("Error deleting address for user {Email}, CorrelationId: {CorrelationId}. Exception: {Exception}", email, correlationId, ex);
-                    return new BadRequestObjectResult(new ApiValidationErrorResponse
-                    {
-                        Errors = [ex.Message]
-                    });
-                }
-            }
-
-            _logger.Error("Problem in deleting user and address {Email}, CorrelationId: {CorrelationId}", email, correlationId);
-            return new BadRequestObjectResult(new ApiValidationErrorResponse
-            {
-                Errors = 
-                [$"Problem in deleting the user with email {email}'s "]
-            });
+            return result.ToOk();
         }
 
-        [Authorize]
-        [HttpDelete("delete-user-address/{id}")]
-        public async Task<ActionResult> DeleteUserAddress(string? id)
-        {
-            var correlationId = GetCorrelationId();
-            _logger.Information("Deleting address for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
+        //[Authorize]
+        //[HttpDelete("delete-user-address/{id}")]
+        //public async Task<ActionResult> DeleteUserAddress(string? id)
+        //{
+        //    var correlationId = GetCorrelationId();
+        //    _logger.Information("Deleting address for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
 
-            var user = await _usermanager.FindByIdAsync(id);
-            if (user == null)
-            {
-                _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", id, correlationId);
-                return NotFound(new ApiException(404, "The user with this id could not find."));
-            }
+        //    var user = await _usermanager.FindByIdAsync(id);
+        //    if (user == null)
+        //    {
+        //        _logger.Warning("User with Id {Id} could not be found, CorrelationId: {CorrelationId}", id, correlationId);
+        //        return NotFound(new ApiException(404, "The user with this id could not find."));
+        //    }
 
-            var addressId = user.AddressId;
-            try
-            {
-                await _uow.AddressRepository.DeleteAsync(addressId);
-                _logger.Information("Address deleted successfully for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
-                return Ok("The address successfully deleted.");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Error deleting address for user {Id}, CorrelationId: {CorrelationId}. Exception: {Exception}", id, correlationId, ex);
-                return new BadRequestObjectResult(new ApiValidationErrorResponse
-                {
-                    Errors = [ex.Message]
-                });
-            }
-        }
+        //    var addressId = user.AddressId;
+        //    try
+        //    {
+        //        await _uow.AddressRepository.DeleteAsync(addressId);
+        //        _logger.Information("Address deleted successfully for user {Id}, CorrelationId: {CorrelationId}", id, correlationId);
+        //        return Ok("The address successfully deleted.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.Error("Error deleting address for user {Id}, CorrelationId: {CorrelationId}. Exception: {Exception}", id, correlationId, ex);
+        //        return new BadRequestObjectResult(new ApiValidationErrorResponse
+        //        {
+        //            Errors = [ex.Message]
+        //        });
+        //    }
+        //}
 
         //[Authorize]
         //[HttpPost("create-user-address/{id}")]
